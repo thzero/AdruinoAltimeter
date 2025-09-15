@@ -4,6 +4,7 @@
 #include <ArduinoJson.h>
 
 #include "flightData.h"
+#include "flightLog.h"
 #include "flightLoggerBase.h"
 
 #define FORMAT_LITTLEFS_IF_FAILED true
@@ -22,5 +23,9 @@ class flightLoggerNull : public flightLoggerBase {
     bool writeFile(int flightNbr) override;
     bool writeFlightCurrent() override;
 };
+
+extern flightLog _flightLog;
+
+extern void setupFlightLog(deviceCommands* commands);
 
 #endif

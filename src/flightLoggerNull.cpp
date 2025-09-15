@@ -1,9 +1,7 @@
 #include <ArduinoJson.h>
-#include <time.h>
 
 #include <debug.h>
 #include "flightLoggerNull.h"
-#include <utilitiesTime.h>
 
 flightLoggerNull::flightLoggerNull() {
   _flightDataTrace = nullptr;
@@ -48,4 +46,10 @@ bool flightLoggerNull::writeFile(int flightNbr) {
 
 bool flightLoggerNull::writeFlightCurrent() {
   return writeFile(geFlightNbrsLast() + 1);
+}
+
+flightLoggerNull _flightLoggerNull;
+flightLog _flightLog;
+void setupFlightLog(deviceCommands* commands) {
+  _flightLog.setup(commands, &_flightLoggerNull);
 }

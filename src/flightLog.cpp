@@ -1,12 +1,10 @@
 #include "flightLog.h"
 
-// template<class T>
-// flightLog<T>::flightLog() {
-//   reset();
-// }
+flightLog::flightLog() {
+  reset();
+}
 
-template<class T>
-void flightLog<T>::init(unsigned long timestamp) {
+void flightLog::init(unsigned long timestamp) {
   // Initialize the flight...
   aborted = false;
   recording = true;
@@ -14,11 +12,10 @@ void flightLog<T>::init(unsigned long timestamp) {
   airborne = true;
   touchdown = false;
 
-  instance.init(timestamp);
+  _instance->init(timestamp);
 }
 
-template<class T>
-void flightLog<T>::reset() {
+void flightLog::reset() {
   // Reset the flight...
   aborted = false;
   recording = false;
@@ -26,16 +23,19 @@ void flightLog<T>::reset() {
   airborne = false;
   touchdown = false;
 
-  instance.reset();
+  if (_instance != nullptr)
+    _instance->reset();
 }
 
-template<class T>
-void flightLog<T>::setup(deviceCommands* commands) {
+byte flightLog::setup(deviceCommands* commands, flightLoggerBase* instance) {
   Serial.println(F("\nSetup flight logger..."));
 
-  if (!instance.initFileSystem()) {
+  _instance = instance;
+  if (_instance == nullptr)
+    return 2;
+  if (!_instance->initFileSystem()) {
     Serial.println(F("Failed to initialize flight logger"));
-    return;
+    return 2;
   }
 
   // TODO: setup flight log commands...
@@ -65,7 +65,7 @@ void flightLog<T>::setup(deviceCommands* commands) {
   // }
   // erase all recorded flight logs
   // if (command == 'e') {
-  //   _flightLog.instance.eraseFlights();
+  //   _flightLog._instance->eraseFlights();
   //   return;
   // }
   // // output to seriali a list of all flight logs
@@ -94,12 +94,12 @@ void flightLog<T>::setup(deviceCommands* commands) {
   // }
   // // delete last recorded flight log
   // if (command == 'x') {
-  //   _flightLog.instance.eraseLast();
+  //   _flightLog._instance->eraseLast();
   //   return;
   // }
   // // reindex recorded flight log index
   // if (command == 'z') {
-  //   _flightLog.instance.reindexFlights();
+  //   _flightLog._instance->reindexFlights();
   //   return;
   // }
 
@@ -110,4 +110,6 @@ void flightLog<T>::setup(deviceCommands* commands) {
   // _deviceCommands.initCommand('@', calibrationSensorsResetCommand, true, "@", "recalibrate the gyro");
 
   Serial.println(F("...flight logger successful."));
+
+  return 0;
 }
