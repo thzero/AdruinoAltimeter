@@ -10,7 +10,7 @@ class flightLog {
     flightLog();
     void init(unsigned long timestamp);
     void reset();
-    byte setup(deviceCommands* commands, flightLoggerBase* instance);
+    byte setup(flightLoggerBase* instance, deviceCommands* deviceCommands);
     
     bool airborne = false;
     bool aborted;
