@@ -25,33 +25,33 @@ void stateMachine::loop(unsigned long timestamp, int delta) {
   // Simple state machine for the flight...
 
   // Serial.println(F("state..."));
-  // Serial.println(_loopState.current);
+  // Serial.println(_loopState);
   // Ground state
-  if (_loopState.current == ABORTED) {
+  if (_loopState == ABORTED) {
     // Serial.println(F("state...ABORTED"));
     // Run the aborted state algorithms
     loopStateABORTED(timestamp, delta);
     return;
   }
-  if (_loopState.current == AIRBORNE_ASCENT) {
+  if (_loopState == AIRBORNE_ASCENT) {
     // Serial.println(F("state...AIRBORNE_ASCENT"));
     // Run the airborne ascent state algorithms
     loopStateAIRBORNE_ASCENT(timestamp, delta);
     return;
   }
-  if (_loopState.current == AIRBORNE_DESCENT) {
+  if (_loopState == AIRBORNE_DESCENT) {
     // Serial.println(F("state...AIRBORNE_DESCENT"));
     // Run the airborne descent state algorithms
     loopStateAIRBORNE_DESCENT(timestamp, delta);
     return;
   }
-  if (_loopState.current == GROUND) {
+  if (_loopState == GROUND) {
     // Serial.println(F("state...GROUND"));
     // Run the ground state algorithms
     loopStateGROUND(timestamp, delta);
     return;
   }
-  if (_loopState.current == LANDED) {
+  if (_loopState == LANDED) {
     // Serial.println(F("state...LANDED"));
     // Run the landed state algorithms
     loopStateLANDED(timestamp, delta);
@@ -61,7 +61,7 @@ void stateMachine::loop(unsigned long timestamp, int delta) {
 
 void stateMachine::loopStateABORTED(unsigned long timestamp, int deltaElapsed) {
   // Determine the aborted loop time delay based on sampling rate.
-  int delta = _throttleAborted.determine(deltaElapsed, stateMachineDefaults.sampleRateAborted);
+  int delta = _throttleAborted.determine('a', deltaElapsed, stateMachineDefaults.sampleRateAborted);
   if (delta == 0)
     return;
 
@@ -82,7 +82,7 @@ void stateMachine::loopStateABORTED(unsigned long timestamp, int deltaElapsed) {
 }
 
 void stateMachine::loopStateABORTEDToGROUND(unsigned long timestamp) {
-  _loopState.current = GROUND;
+  _loopState = GROUND;
 
   debug(F(""));
   debug(F(""));
@@ -128,7 +128,7 @@ void stateMachine::loopStateAIRBORNEToABORTED(char message1[], char message2[]) 
 
   _countdownAborted = 0;
   
-  _loopState.current = ABORTED;
+  _loopState = ABORTED;
 }
 
 float stateMachine::loopStateAIRBORNE(unsigned long currentTimestamp, long diffTime) {
@@ -279,7 +279,7 @@ void stateMachine::loopStateAIRBORNE_ASCENTToAIRBORNE_DESCENT() {
   debug(F(""));
   debug(F(""));
 
-  _loopState.current = AIRBORNE_DESCENT;
+  _loopState = AIRBORNE_DESCENT;
 }
 
 void stateMachine::loopStateAIRBORNE_DESCENT(unsigned long timestamp, int deltaElapsed) {
@@ -350,7 +350,7 @@ void stateMachine::loopStateAIRBORNE_DESCENTToLANDED() {
   debug(F(""));
   debug(F(""));
 
-  _loopState.current = LANDED;
+  _loopState = LANDED;
 }
 
 void stateMachine::loopStateLANDED(unsigned long timestamp, int deltaElapsed) {
@@ -398,7 +398,7 @@ void stateMachine::loopStateLANDEDToGROUND() {
   debug(F(""));
   debug(F(""));
 
-  _loopState.current = GROUND;
+  _loopState = GROUND;
   _countdownAborted = 0;
   _countdownLanded = 0;
 
@@ -449,7 +449,7 @@ void stateMachine::loopStateGROUND(unsigned long timestamp, int deltaElapsed) {
   //   interpretCommandBuffer();  // TODO: It'd be nice to kick this to the other processor...
 
   // Determine the ground loop time delay based on sampling rate.
-  int delta = _throttleGround.determine(deltaElapsed, _sampleRateGround);
+  int delta = _throttleGround.determine('g', deltaElapsed, _sampleRateGround);
   if (delta == 0)
     return;
 
@@ -505,7 +505,7 @@ void stateMachine::loopStateGROUNDToAIRBORNE_ASCENT(unsigned long timestamp) {
   // drawTftReset();
   // drawTftFlightAirborneStart();
 
-  _loopState.current = AIRBORNE_ASCENT;
+  _loopState = AIRBORNE_ASCENT;
 }
 
 void stateMachine::preferencesOutput() {
@@ -670,6 +670,10 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, deviceCommands*
   Serial.println(F("...state machine setup successful."));
   Serial.println();
   return 0;
+}
+
+loopStates stateMachine::state() {
+  return _loopState;
 }
 
 int stateMachine::_checkValues(int values[], int value, int defaultValue, int size) {

@@ -19,10 +19,6 @@ enum loopStates {
   LANDED = 104
 };
 
-struct loopStateMachine {
-  enum loopStates current = GROUND;
-};
-
 struct stateMachineDefaultsStruct {
     int altitudeLiftoff = 20;
     int sampleRateAirborneAscent = 50;
@@ -48,6 +44,7 @@ class stateMachine {
     void reset();
     void save(int launchDetect, int sampleRateAirborneAscent, int sampleRateAirborneDecent, int sampleRateGround);
     byte setup(flightLog* flightLog, sensors* sensors, deviceCommands* deviceCommands, StateMachineLedBlinkFunctionPtr ledBlinkFunc);
+    loopStates state();
 
     int launchDetect();
     void preferencesOutput();
@@ -84,7 +81,7 @@ class stateMachine {
     deviceCommands* _deviceCommands;
     flightLog* _flightLog;
     StateMachineLedBlinkFunctionPtr _ledBlinkFunc;
-    loopStateMachine _loopState;
+    loopStates _loopState = GROUND;
     loopThrottle _throttleAborted;
     loopThrottle _throttleAirborneAscent;
     loopThrottle _throttleAirborneDescent;
