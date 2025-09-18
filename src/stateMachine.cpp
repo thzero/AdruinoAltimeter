@@ -572,20 +572,20 @@ int stateMachine::sampleRateGround() {
 }
 
 void stateMachine::save(int launchDetect, int sampleRateAirborneAscent, int sampleRateAirborneDecent, int sampleRateGround) {
-  Serial.println(F("Save state machine..."));
+  Serial.println(F("\tSave state machine..."));
   
 #ifdef DEBUG
-  Serial.println(F("\t...state machine... save requests"));
-  Serial.print(F("\tlaunchDetect="));
+  Serial.println(F("\t\t...state machine... save requests"));
+  Serial.print(F("\t\tlaunchDetect="));
   Serial.println(launchDetect);
-  Serial.print(F("\tsampleRateAirborneAscent="));
+  Serial.print(F("\t\tsampleRateAirborneAscent="));
   Serial.println(sampleRateAirborneAscent);
-  Serial.print(F("\tsampleRateAirborneDecent="));
+  Serial.print(F("\t\tsampleRateAirborneDecent="));
   Serial.println(sampleRateAirborneDecent);
-  Serial.print(F("\tsampleRateGround="));
+  Serial.print(F("\t\tsampleRateGround="));
   Serial.println(sampleRateGround);
 
-  Serial.println(F("\t...state machine... save current"));
+  Serial.println(F("\t\t...state machine... save current"));
   _displaySettings();
 #endif
 
@@ -595,14 +595,14 @@ void stateMachine::save(int launchDetect, int sampleRateAirborneAscent, int samp
   _sampleRateGround = _checkValues(sampleRateGroundValues, sampleRateGround, stateMachineDefaults.sampleRateGround, sizeof(sampleRateGroundValues) / sizeof(sampleRateGroundValues[0]));
   
 #ifdef DEBUG
-  Serial.println(F("\t...state machine... save checked"));
-  Serial.print(F("\t_altitudeLiftoff="));
+  Serial.println(F("\t\t...state machine... save checked"));
+  Serial.print(F("\t\t_altitudeLiftoff="));
   Serial.println(_altitudeLiftoff);
-  Serial.print(F("\t_sampleRateAirborneAscent="));
+  Serial.print(F("\t\t_sampleRateAirborneAscent="));
   Serial.println(_sampleRateAirborneAscent);
-  Serial.print(F("\t_sampleRateAirborneDescent="));
+  Serial.print(F("\t\t_sampleRateAirborneDescent="));
   Serial.println(_sampleRateAirborneDescent);
-  Serial.print(F("\t_sampleRateGround="));
+  Serial.print(F("\t\t_sampleRateGround="));
   Serial.println(_sampleRateGround);
 #endif
 
@@ -617,12 +617,12 @@ void stateMachine::save(int launchDetect, int sampleRateAirborneAscent, int samp
   _altitudeGround = _altitudeLiftoff / 2;
 
 #ifdef DEBUG
-  Serial.println(F("\t...state machine... saved state"));
+  Serial.println(F("\t\t...state machine... saved state"));
   _displaySettings();
   Serial.println(F(""));
 #endif
 
-  Serial.println(F("...state machine save successful."));
+  Serial.println(F("\t...state machine save successful."));
 }
 
 byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineStateFunctionPtr stateFunc = nullptr, StateMachineStateThottledFunctionPtr stateThrottledFunc = nullptr, StateMachineStateChangedFunctionPtr stateChangedFunc = nullptr) {
