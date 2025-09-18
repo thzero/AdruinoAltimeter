@@ -28,7 +28,7 @@ void flightLog::reset() {
 }
 
 byte flightLog::setup(flightLoggerBase* instance, deviceCommands* deviceCommands) {
-  Serial.println(F("\nSetup flight logger..."));
+  Serial.println(F("Setup flight logger..."));
 
   _instance = instance;
   if (_instance == nullptr)
@@ -112,6 +112,7 @@ byte flightLog::setup(flightLoggerBase* instance, deviceCommands* deviceCommands
     }
 
   Serial.println(F("...flight logger successful."));
+  Serial.println();
 
   return 0;
 }
