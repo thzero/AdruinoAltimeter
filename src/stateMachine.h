@@ -1,6 +1,7 @@
 #ifndef _STATE_MACHINE_H
 #define _STATE_MACHINE_H
 
+#include <buttonHandlerBase.h>
 #include <flightLog.h>
 #include <loopThrottle.h>
 #include "sensors.h"
@@ -12,12 +13,17 @@
 #define PREFERENCE_KEY_LAUNCH_DETECT "smLD"
 
 enum loopStates {
-  ABORTED = 100,
-  AIRBORNE_ASCENT = 101,
-  AIRBORNE_DESCENT = 1022,
-  GROUND = 103,
-  LANDED = 104
+  STATEMACHINE_ABORTED = 100,
+  STATEMACHINE_AIRBORNE_ASCENT = 101,
+  STATEMACHINE_AIRBORNE_DESCENT = 1022,
+  STATEMACHINE_GROUND = 103,
+  STATEMACHINE_LANDED = 104
 };
+
+typedef void (*StateMachineStateFunctionPtr)(loopStates state, unsigned long timestamp, unsigned long deltaElapsed);
+typedef void (*StateMachineStateChangedFunctionPtr)(loopStates state, loopStates stateFrom, unsigned long timestamp, unsigned long deltaElapsed);
+typedef void (*StateMachineStateThottledFunctionPtr)(loopStates state, unsigned long timestamp, unsigned long deltaElapsed);
+typedef void (*StateMachineLedBlinkFunctionPtr)(unsigned long delta, int state);
 
 struct stateMachineDefaultsStruct {
     int altitudeLiftoff = 20;
@@ -35,15 +41,13 @@ struct stateMachineDefaultsStruct {
     int timeOutTimeToApogee = 20000;
 };
 
-typedef void (*StateMachineLedBlinkFunctionPtr)(int delta, int state);
-
 class stateMachine {
   public:
     stateMachine();
-    void loop(unsigned long timestamp, int delta);
+    void loop(unsigned long timestamp, unsigned long delta);
     void reset();
     void save(int launchDetect, int sampleRateAirborneAscent, int sampleRateAirborneDecent, int sampleRateGround);
-    byte setup(flightLog* flightLog, sensors* sensors, deviceCommands* deviceCommands, StateMachineLedBlinkFunctionPtr ledBlinkFunc);
+    byte setup(flightLog* flightLog, sensors* sensors, StateMachineStateFunctionPtr stateFunc, StateMachineStateThottledFunctionPtr stateThrottledFunc, StateMachineStateChangedFunctionPtr stateChangedFunc);
     loopStates state();
 
     int launchDetect();
@@ -58,19 +62,19 @@ class stateMachine {
     int sampleRateGroundValues[8] = { 5, 10, 15, 20, 25, 30, 35, 40 };
     
   private:
-    void loopStateABORTED(unsigned long timestamp, int deltaElapsed);
-    void loopStateABORTEDToGROUND(unsigned long timestamp);
-    void loopStateAIRBORNEToABORTED(char message1[], char message2[]);
+    void loopStateABORTED(unsigned long timestamp, unsigned long deltaElapsed);
+    void loopStateABORTEDToGROUND(unsigned long timestamp, unsigned long deltaElapsed);
+    void loopStateAIRBORNEToABORTED(unsigned long timestamp, unsigned long deltaElapsed, char message1[], char message2[]);
     float loopStateAIRBORNE(unsigned long currentTimestamp, long diffTime);
-    void loopStateAIRBORNE_ASCENT(unsigned long timestamp, int deltaElapsedElapsed);
-    void loopStateAIRBORNE_ASCENTToAIRBORNE_DESCENT();
-    void loopStateAIRBORNE_DESCENT(unsigned long timestamp, int deltaElapsedElapsed);
-    void loopStateAIRBORNE_DESCENTToLANDED();
-    void loopStateLANDED(unsigned long timestamp, int deltaElapsedElapsed);
-    void loopStateLANDEDToGROUND();
-    void loopStateToGROUND();
-    void loopStateGROUND(unsigned long timestamp, int deltaElapsedElapsed);
-    void loopStateGROUNDToAIRBORNE_ASCENT(unsigned long timestamp);
+    void loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned long deltaElapsedElapsed);
+    void loopStateAIRBORNE_ASCENTToAIRBORNE_DESCENT(unsigned long timestamp, unsigned long deltaElapsed);
+    void loopStateAIRBORNE_DESCENT(unsigned long timestamp, unsigned long deltaElapsedElapsed);
+    void loopStateAIRBORNE_DESCENTToLANDED(unsigned long timestamp, unsigned long deltaElapsed);
+    void loopStateLANDED(unsigned long timestamp, unsigned long deltaElapsedElapsed);
+    void loopStateLANDEDToGROUND(unsigned long timestamp, unsigned long deltaElapsed);
+    void loopStateToGROUND(unsigned long timestamp, unsigned long deltaElapsed);
+    void loopStateGROUND(unsigned long timestamp, unsigned long deltaElapsedElapsed);
+    void loopStateGROUNDToAIRBORNE_ASCENT(unsigned long timestamp, unsigned long deltaElapsed);
     int _checkValues(int values[], int value, int defaultValue, int size);
     void _displaySettings();
 
@@ -78,10 +82,11 @@ class stateMachine {
     int _altitudeGround = 0;
     int _countdownAborted = 0;
     int _countdownLanded = 0;
-    deviceCommands* _deviceCommands;
     flightLog* _flightLog;
-    StateMachineLedBlinkFunctionPtr _ledBlinkFunc;
-    loopStates _loopState = GROUND;
+    loopStates _loopState = STATEMACHINE_GROUND;
+    StateMachineStateFunctionPtr _loopStatedFunc;
+    StateMachineStateChangedFunctionPtr _loopStateChangedFunc;
+    StateMachineStateThottledFunctionPtr _loopStateThrottledFunc;
     loopThrottle _throttleAborted;
     loopThrottle _throttleAirborneAscent;
     loopThrottle _throttleAirborneDescent;

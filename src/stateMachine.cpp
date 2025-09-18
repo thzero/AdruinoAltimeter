@@ -21,37 +21,37 @@ int stateMachine::launchDetect() {
   return _altitudeLiftoff;
 }
 
-void stateMachine::loop(unsigned long timestamp, int delta) {
+void stateMachine::loop(unsigned long timestamp, unsigned long delta) {
   // Simple state machine for the flight...
 
   // Serial.println(F("state..."));
   // Serial.println(_loopState);
   // Ground state
-  if (_loopState == ABORTED) {
+  if (_loopState == STATEMACHINE_ABORTED) {
     // Serial.println(F("state...ABORTED"));
     // Run the aborted state algorithms
     loopStateABORTED(timestamp, delta);
     return;
   }
-  if (_loopState == AIRBORNE_ASCENT) {
+  if (_loopState == STATEMACHINE_AIRBORNE_ASCENT) {
     // Serial.println(F("state...AIRBORNE_ASCENT"));
     // Run the airborne ascent state algorithms
     loopStateAIRBORNE_ASCENT(timestamp, delta);
     return;
   }
-  if (_loopState == AIRBORNE_DESCENT) {
+  if (_loopState == STATEMACHINE_AIRBORNE_DESCENT) {
     // Serial.println(F("state...AIRBORNE_DESCENT"));
     // Run the airborne descent state algorithms
     loopStateAIRBORNE_DESCENT(timestamp, delta);
     return;
   }
-  if (_loopState == GROUND) {
+  if (_loopState == STATEMACHINE_GROUND) {
     // Serial.println(F("state...GROUND"));
     // Run the ground state algorithms
     loopStateGROUND(timestamp, delta);
     return;
   }
-  if (_loopState == LANDED) {
+  if (_loopState == STATEMACHINE_LANDED) {
     // Serial.println(F("state...LANDED"));
     // Run the landed state algorithms
     loopStateLANDED(timestamp, delta);
@@ -59,21 +59,19 @@ void stateMachine::loop(unsigned long timestamp, int delta) {
   }
 }
 
-void stateMachine::loopStateABORTED(unsigned long timestamp, int deltaElapsed) {
+void stateMachine::loopStateABORTED(unsigned long timestamp, unsigned long deltaElapsed) {
   // Determine the aborted loop time delay based on sampling rate.
-  int delta = _throttleAborted.determine('a', deltaElapsed, stateMachineDefaults.sampleRateAborted);
+  unsigned long delta = _throttleAborted.determine('a', deltaElapsed, stateMachineDefaults.sampleRateAborted);
   if (delta == 0)
     return;
 
   // Functionality that happen on the tick goes here:
 
   // _neoPixelBlinker.blink(0xFF0000);
-  // if (_ledBlinkFunc != nullptr)
-  //   _ledBlinkFunc(timestamp, 0xFF0000);
 
   // Transition to the GROUND stage.
   if (_countdownAborted > stateMachineDefaults.sampleMeasuresAborted) {
-    loopStateABORTEDToGROUND(timestamp);
+    loopStateABORTEDToGROUND(timestamp, deltaElapsed);
     return;
   }
 
@@ -81,9 +79,7 @@ void stateMachine::loopStateABORTED(unsigned long timestamp, int deltaElapsed) {
   debug(F("countdownAborted"), _countdownAborted); // TODO
 }
 
-void stateMachine::loopStateABORTEDToGROUND(unsigned long timestamp) {
-  _loopState = GROUND;
-
+void stateMachine::loopStateABORTEDToGROUND(unsigned long timestamp, unsigned long deltaElapsed) {
   debug(F(""));
   debug(F(""));
   debug(F(""));
@@ -96,10 +92,14 @@ void stateMachine::loopStateABORTEDToGROUND(unsigned long timestamp) {
   debug(F(""));
   debug(F(""));
 
-  loopStateToGROUND();
+  if (_loopStateChangedFunc != nullptr)
+    _loopStateChangedFunc(STATEMACHINE_GROUND, _loopState, timestamp, deltaElapsed);
+
+  _loopState = STATEMACHINE_GROUND;
+  loopStateToGROUND(timestamp, deltaElapsed);
 }
 
-void stateMachine::loopStateAIRBORNEToABORTED(char message1[], char message2[]) {
+void stateMachine::loopStateAIRBORNEToABORTED(unsigned long timestamp, unsigned long deltaElapsed, char message1[], char message2[]) {
   // Something went wrong and aborting...
 
   // _flightLogger.aborted = true;
@@ -127,8 +127,11 @@ void stateMachine::loopStateAIRBORNEToABORTED(char message1[], char message2[]) 
   debug(F(""));
 
   _countdownAborted = 0;
+
+  if (_loopStateChangedFunc != nullptr)
+    _loopStateChangedFunc(STATEMACHINE_ABORTED, _loopState, timestamp, deltaElapsed);
   
-  _loopState = ABORTED;
+  _loopState = STATEMACHINE_ABORTED;
 }
 
 float stateMachine::loopStateAIRBORNE(unsigned long currentTimestamp, long diffTime) {
@@ -179,16 +182,14 @@ float stateMachine::loopStateAIRBORNE(unsigned long currentTimestamp, long diffT
   return 0;
 }
 
-void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, int deltaElapsed) {
-//   int delta = _throttleAirborneAscent.determine(deltaElapsed, _sampleRateAirborneAscent);
+void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned long deltaElapsed) {
+//   unsigned long delta = _throttleAirborneAscent.determine(deltaElapsed, _sampleRateAirborneAscent);
 //   if (delta == 0)
 //     return;
 
 //   // Functionality that happen on the tick goes here:
 
 //   _neoPixelBlinker.blink(0x00FF00);
-  // if (_ledBlinkFunc != nullptr)
-  //   _ledBlinkFunc(timestamp, 0x00FF00);
 
 //   long currentTimestamp = timestamp - _flightLogger.instance.getData().timestampLaunch;
 // #ifdef DEBUG_ALTIMETER
@@ -218,7 +219,7 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, int deltaEl
 // #endif
 //     if (_flightLogger.measures == 0) {
 //       // Detected apogee.
-//       loopStateAIRBORNE_ASCENTToAIRBORNE_DESCENT();
+//       loopStateAIRBORNE_ASCENTToAIRBORNE_DESCENT(timestamp, deltaElapsed);
 //       return;
 //     }
 //   } 
@@ -245,7 +246,7 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, int deltaEl
 // #endif
 //   if (timestampApogeeCheck) {
 //     // Something went wrong and apogee was never found, so abort!
-//     loopStateAIRBORNEToABORTED("Time to apogee threshold exceeded!", "AIRBORNE_ASCENT aborted, returning to GROUND!!!!");
+//     loopStateAIRBORNEToABORTED(timestamp, deltaElapsed, "Time to apogee threshold exceeded!", "AIRBORNE_ASCENT aborted, returning to GROUND!!!!");
 //     return;
 //   }
 
@@ -258,12 +259,12 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, int deltaEl
 // #endif
 //   if (timeoutRecordingCheck) {
 //     // Something went wrong., so abort!
-//     loopStateAIRBORNEToABORTED("Time to apogee threshold exceeded!", "AIRBORNE_ASCENT aborted, returning to GROUND!!!!");
+//     loopStateAIRBORNEToABORTED(timestamp, deltaElapsed, "Time to apogee threshold exceeded!", "AIRBORNE_ASCENT aborted, returning to GROUND!!!!");
 //     return;
 //   }
 }
 
-void stateMachine::loopStateAIRBORNE_ASCENTToAIRBORNE_DESCENT() {
+void stateMachine::loopStateAIRBORNE_ASCENTToAIRBORNE_DESCENT(unsigned long timestamp, unsigned long deltaElapsed) {
   // _flightLogger.instance.setAltitudeApogee(_flightLogger.instance.getData().altitudeApogeeFirstMeasure);
   // _flightLogger.instance.setTimestampApogee(_flightLogger.instance.getData().timestampApogeeFirstMeasure);
 
@@ -279,10 +280,13 @@ void stateMachine::loopStateAIRBORNE_ASCENTToAIRBORNE_DESCENT() {
   debug(F(""));
   debug(F(""));
 
-  _loopState = AIRBORNE_DESCENT;
+  if (_loopStateChangedFunc != nullptr)
+    _loopStateChangedFunc(STATEMACHINE_AIRBORNE_DESCENT, _loopState, timestamp, deltaElapsed);
+
+  _loopState = STATEMACHINE_AIRBORNE_DESCENT;
 }
 
-void stateMachine::loopStateAIRBORNE_DESCENT(unsigned long timestamp, int deltaElapsed) {
+void stateMachine::loopStateAIRBORNE_DESCENT(unsigned long timestamp, unsigned long deltaElapsed) {
 //   int delta = _throttleAirborneDescent.determine(deltaElapsed, _sampleRateAirborneDescent);
 //   if (delta == 0)
 //     return;
@@ -290,8 +294,6 @@ void stateMachine::loopStateAIRBORNE_DESCENT(unsigned long timestamp, int deltaE
 //   // Functionality that happen on the tick goes here:
 
 //   _neoPixelBlinker.blink(0x0000FF);
-  // if (_ledBlinkFunc != nullptr)
-  //   _ledBlinkFunc(timestamp, 0x0000FF);
 
 //   long currentTimestamp = millis() - _flightLogger.instance.getData().timestampLaunch;
 
@@ -309,7 +311,7 @@ void stateMachine::loopStateAIRBORNE_DESCENT(unsigned long timestamp, int deltaE
 
 //   if (timeoutRecordingCheck) {
 //     // Something went wrong and the recordingt timeout was hit, so abort!
-//     loopStateAIRBORNEToABORTED("Exceeded recording timeout!", "AIRBORNE_DESCENT aborted, returning to GROUND!!!!");
+//     loopStateAIRBORNEToABORTED(timestamp, deltaElapsed, "Exceeded recording timeout!", "AIRBORNE_DESCENT aborted, returning to GROUND!!!!");
 //     return;
 //   }
 
@@ -326,12 +328,12 @@ void stateMachine::loopStateAIRBORNE_DESCENT(unsigned long timestamp, int deltaE
 //   _flightLogger.instance.setAltitudeTouchdown(_flightLogger.instance.getData().altitudeLast);
 //   _flightLogger.instance.setTimestampTouchdown(_flightLogger.instance.getData().timestampPrevious);
 //     // Passed the descent touchdown altitude check, so the flight log is ended and return to GROUND
-//     loopStateAIRBORNE_DESCENTToLANDED();
+//     loopStateAIRBORNE_DESCENTToLANDED(timestamp, deltaElapsed);
 //     return;
 //   }
 }
 
-void stateMachine::loopStateAIRBORNE_DESCENTToLANDED() {
+void stateMachine::loopStateAIRBORNE_DESCENTToLANDED(unsigned long timestamp, unsigned long deltaElapsed) {
   // Complete the flight
   Serial.println(F("Flight has ended!!!"));
 
@@ -350,20 +352,21 @@ void stateMachine::loopStateAIRBORNE_DESCENTToLANDED() {
   debug(F(""));
   debug(F(""));
 
-  _loopState = LANDED;
+  if (_loopStateChangedFunc != nullptr)
+    _loopStateChangedFunc(STATEMACHINE_LANDED, _loopState, timestamp, deltaElapsed);
+
+  _loopState = STATEMACHINE_LANDED;
 }
 
-void stateMachine::loopStateLANDED(unsigned long timestamp, int deltaElapsed) {
+void stateMachine::loopStateLANDED(unsigned long timestamp, unsigned long deltaElapsed) {
 //   // Determine the ground loop time delay based on sampling rate.
-//   int delta = _throttleLanded.determine(deltaElapsed, stateMachineDefaults.sampleRateLanded);
+//   unsigned long delta = _throttleLanded.determine(deltaElapsed, stateMachineDefaults.sampleRateLanded);
 //   if (delta == 0)
 //     return;
 
 //   // Functionality that happen on the tick goes here:
 
 //   _neoPixelBlinker.blink(0xFF00FF);
-  // if (_ledBlinkFunc != nullptr)
-  //   _ledBlinkFunc(timestamp, 0xFF00FF);
 
 //   // debug(F("loopStateLANDED...timestamp"), timestamp);
 
@@ -373,14 +376,14 @@ void stateMachine::loopStateLANDED(unsigned long timestamp, int deltaElapsed) {
 // #endif
 //   // Transition to the AIRBORNE_ASCENT ascent stage.
 //   if (_countdownLanded >= stateMachineDefaults.sampleMeasuresLanded) {
-//     loopStateLANDEDToGROUND();
+//     loopStateLANDEDToGROUND(timestamp, deltaElapsed);
 //     return;
 //   }
 
 //   _countdownLanded++;
 }
 
-void stateMachine::loopStateLANDEDToGROUND() {
+void stateMachine::loopStateLANDEDToGROUND(unsigned long timestamp, unsigned long deltaElapsed) {
 // #ifdef DEV_SIM
 //   if (_simulation.isRunning()) 
 //     _simulation.stop();
@@ -398,7 +401,10 @@ void stateMachine::loopStateLANDEDToGROUND() {
   debug(F(""));
   debug(F(""));
 
-  _loopState = GROUND;
+  if (_loopStateChangedFunc != nullptr)
+    _loopStateChangedFunc(STATEMACHINE_GROUND, _loopState, timestamp, deltaElapsed);
+
+  _loopState = STATEMACHINE_GROUND;
   _countdownAborted = 0;
   _countdownLanded = 0;
 
@@ -416,10 +422,10 @@ void stateMachine::loopStateLANDEDToGROUND() {
 //   _flightLogger.instance.outputSerialExpanded();
 //   Serial.print(F("\n"));
 
-  loopStateToGROUND();
+  loopStateToGROUND(timestamp, deltaElapsed);
 }
 
-void stateMachine::loopStateToGROUND() {
+void stateMachine::loopStateToGROUND(unsigned long timestamp, unsigned long deltaElapsed) {
   // To avoid battery drain, etc. user should choose to turn on networking...
   // networkStart();
 
@@ -427,15 +433,13 @@ void stateMachine::loopStateToGROUND() {
   // drawTftSplash();
 }
 
-void stateMachine::loopStateGROUND(unsigned long timestamp, int deltaElapsed) {
+void stateMachine::loopStateGROUND(unsigned long timestamp, unsigned long deltaElapsed) {
   // Serial.printf(F("...loopStateGROUND... %d\n"), deltaElapsed);
   // Only blink while on the ground!
   // _neoPixelBlinker.blink(timestamp, 500);
-  if (_ledBlinkFunc != nullptr)
-     _ledBlinkFunc(deltaElapsed, GROUND);
-  
-  // Query the button handler to check for button press activity.
-  // handleButtonLoop();
+
+  if (_loopStatedFunc != nullptr)
+    _loopStatedFunc(_loopState, timestamp, deltaElapsed);
 
   // networkLoop();
 
@@ -444,18 +448,15 @@ void stateMachine::loopStateGROUND(unsigned long timestamp, int deltaElapsed) {
   // memmove(&voltage[0], &voltage[1], (voltage_array_capacity - 1) * sizeof(voltage[0]));
   // voltage[voltage_array_capacity - 1] = analogReadMilliVolts(10)/500;
 
-  // Capture the command buffer.
-  // if (readSerial(timestamp, deltaElapsed))
-  //   interpretCommandBuffer();  // TODO: It'd be nice to kick this to the other processor...
-
   // Determine the ground loop time delay based on sampling rate.
-  int delta = _throttleGround.determine('g', deltaElapsed, _sampleRateGround);
+  unsigned long delta = _throttleGround.determine('g', deltaElapsed, _sampleRateGround);
   if (delta == 0)
     return;
 
-  // Functionality that happen on the tick goes here:
-
   // debug(F("stateGROUND...timestamp"), timestamp);
+  
+  if (_loopStateThrottledFunc != nullptr)
+    _loopStateThrottledFunc(_loopState, timestamp, deltaElapsed);
 
   // Get the current altitude and determine the delta from initial.
 //   float altitude = readSensorAltitude();
@@ -474,18 +475,16 @@ void stateMachine::loopStateGROUND(unsigned long timestamp, int deltaElapsed) {
   // // Check for whether we've left the ground
   // if (altitude > altitudeLaunchApogeeTarget) {
   //   // Transition to the AIRBORNE_ASCENT ascent stage.
-  //   loopStateGROUNDToAIRBORNE_ASCENT(timestamp);
+  //   loopStateGROUNDToAIRBORNE_ASCENT(timestamp, deltaElapsed);
   //   return;
   // }
 }
 
-void stateMachine::loopStateGROUNDToAIRBORNE_ASCENT(unsigned long timestamp) {
+void stateMachine::loopStateGROUNDToAIRBORNE_ASCENT(unsigned long timestamp, unsigned long deltaElapsed) {
   // Turn off networks, we don't need it in the air...
   // networkDisable();
 
   // _neoPixelBlinker.off();
-  // if (_ledBlinkFunc != nullptr)
-  //   _ledBlinkFunc(false);
   
   debug(F(""));
   debug(F(""));
@@ -505,7 +504,10 @@ void stateMachine::loopStateGROUNDToAIRBORNE_ASCENT(unsigned long timestamp) {
   // drawTftReset();
   // drawTftFlightAirborneStart();
 
-  _loopState = AIRBORNE_ASCENT;
+  if (_loopStateChangedFunc != nullptr)
+    _loopStateChangedFunc(STATEMACHINE_AIRBORNE_ASCENT, _loopState, timestamp, deltaElapsed);
+
+  _loopState = STATEMACHINE_AIRBORNE_ASCENT;
 }
 
 void stateMachine::preferencesOutput() {
@@ -623,15 +625,15 @@ void stateMachine::save(int launchDetect, int sampleRateAirborneAscent, int samp
   Serial.println(F("...state machine save successful."));
 }
 
-byte stateMachine::setup(flightLog* flightLog, sensors* sensors, deviceCommands* deviceCommands, StateMachineLedBlinkFunctionPtr ledBlinkFunc) {
+byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineStateFunctionPtr stateFunc = nullptr, StateMachineStateThottledFunctionPtr stateThrottledFunc = nullptr, StateMachineStateChangedFunctionPtr stateChangedFunc = nullptr) {
   Serial.println(F("Setup state machine..."));
 
   _flightLog = flightLog;
   if (_flightLog == nullptr)
     return 2;
-  _deviceCommands = deviceCommands;
-  _ledBlinkFunc = ledBlinkFunc;
   _sensors = sensors;
+  _loopStatedFunc = stateFunc;
+  _loopStateThrottledFunc = stateThrottledFunc;
 
   // Preferences preferences;
   // preferences.begin(PREFERENCE_KEY, false);
