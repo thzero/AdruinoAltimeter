@@ -21,7 +21,7 @@ class sensors {
     void sleep();
     byte setup(sensorBase* atmosphereSensor, sensorBase* imuSensor);
     void setupCompleted();
-    void calibrationResetCommand(uint8_t commandBuffer[], int commandBufferLength);
+    void calibrationResetCommand(uint8_t* commandBuffer, uint16_t commandBufferLength);
   private:
     sensorBase* _atmosphereSensor;
     // sensorIMU _imuSensor;
@@ -30,6 +30,6 @@ class sensors {
 };
 
 extern sensors _sensors;
-extern void calibrationResetCommand(uint8_t commandBuffer[], int commandBufferLength);
+extern void calibrationResetCommand(uint8_t* commandBuffer, uint16_t commandBufferLength);
 
 #endif
