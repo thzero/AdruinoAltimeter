@@ -49,7 +49,6 @@ bool flightLoggerNull::writeFlightCurrent() {
 }
 
 flightLoggerNull _flightLoggerNull;
-flightLog _flightLog;
 void setupFlightLog(deviceCommands* commands) {
   _flightLog.setup(&_flightLoggerNull, commands);
 }

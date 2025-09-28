@@ -1,6 +1,14 @@
 #ifndef _FLIGHT_DATA_H
 #define _FLIGHT_DATA_H
 
+enum flightStates {
+  FLIGHT_STATE_ABORTED = 100,
+  FLIGHT_STATE_AIRBORNE_ASCENT = 101,
+  FLIGHT_STATE_AIRBORNE_DESCENT = 1022,
+  FLIGHT_STATE_GROUND = 103,
+  FLIGHT_STATE_LANDED = 104
+};
+
 struct flightDataStruct {
   float altitudeApogee;
   float altitudeApogeeFirstMeasure;
@@ -22,7 +30,7 @@ struct flightDataTraceStruct {
   float accelX;
   float accelY;
   float accelZ;
-  long altitude;
+  float altitude;
   long diffTime;
   float gyroX;
   float gyroY;
@@ -31,6 +39,36 @@ struct flightDataTraceStruct {
   float pressure;
   float temperature;
   float velocity;
+};
+
+struct __attribute__((packed)) flightDataTransferAccelerometerValues {
+  float x;
+  float y;
+  float z;
+};
+
+struct __attribute__((packed)) flightDataTransferAtmosphereValues {
+  float altitude;
+  float altitudeInitial;
+  float humidity;
+  float humidityInitial;
+  float pressure;
+  float pressureInitial;
+  float temperature;
+  float temperatureInitial;
+};
+
+struct __attribute__((packed)) flightDataTransferGyroscopeValues {
+  float x;
+  float y;
+  float z;
+};
+
+struct __attribute__((packed)) flightDataTransferStruct {
+  uint8_t state;
+  flightDataTransferAccelerometerValues acceleration;
+  flightDataTransferAtmosphereValues atmosphere;
+  flightDataTransferGyroscopeValues gyroscope;
 };
 
 struct flightMinAndMaxStruct {

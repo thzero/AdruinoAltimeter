@@ -27,31 +27,31 @@ void stateMachine::loop(unsigned long timestamp, unsigned long delta) {
   // Serial.println(F("state..."));
   // Serial.println(_loopState);
   // Ground state
-  if (_loopState == STATEMACHINE_ABORTED) {
+  if (_loopState == FLIGHT_STATE_ABORTED) {
     // Serial.println(F("state...ABORTED"));
     // Run the aborted state algorithms
     loopStateABORTED(timestamp, delta);
     return;
   }
-  if (_loopState == STATEMACHINE_AIRBORNE_ASCENT) {
+  if (_loopState == FLIGHT_STATE_AIRBORNE_ASCENT) {
     // Serial.println(F("state...AIRBORNE_ASCENT"));
     // Run the airborne ascent state algorithms
     loopStateAIRBORNE_ASCENT(timestamp, delta);
     return;
   }
-  if (_loopState == STATEMACHINE_AIRBORNE_DESCENT) {
+  if (_loopState == FLIGHT_STATE_AIRBORNE_DESCENT) {
     // Serial.println(F("state...AIRBORNE_DESCENT"));
     // Run the airborne descent state algorithms
     loopStateAIRBORNE_DESCENT(timestamp, delta);
     return;
   }
-  if (_loopState == STATEMACHINE_GROUND) {
+  if (_loopState == FLIGHT_STATE_GROUND) {
     // Serial.println(F("state...GROUND"));
     // Run the ground state algorithms
     loopStateGROUND(timestamp, delta);
     return;
   }
-  if (_loopState == STATEMACHINE_LANDED) {
+  if (_loopState == FLIGHT_STATE_LANDED) {
     // Serial.println(F("state...LANDED"));
     // Run the landed state algorithms
     loopStateLANDED(timestamp, delta);
@@ -93,9 +93,9 @@ void stateMachine::loopStateABORTEDToGROUND(unsigned long timestamp, unsigned lo
   debug(F(""));
 
   if (_loopStateChangedFunc != nullptr)
-    _loopStateChangedFunc(STATEMACHINE_GROUND, _loopState, timestamp, deltaElapsed);
+    _loopStateChangedFunc(FLIGHT_STATE_GROUND, _loopState, timestamp, deltaElapsed);
 
-  _loopState = STATEMACHINE_GROUND;
+  _loopState = FLIGHT_STATE_GROUND;
   loopStateToGROUND(timestamp, deltaElapsed);
 }
 
@@ -129,9 +129,9 @@ void stateMachine::loopStateAIRBORNEToABORTED(unsigned long timestamp, unsigned 
   _countdownAborted = 0;
 
   if (_loopStateChangedFunc != nullptr)
-    _loopStateChangedFunc(STATEMACHINE_ABORTED, _loopState, timestamp, deltaElapsed);
+    _loopStateChangedFunc(FLIGHT_STATE_ABORTED, _loopState, timestamp, deltaElapsed);
   
-  _loopState = STATEMACHINE_ABORTED;
+  _loopState = FLIGHT_STATE_ABORTED;
 }
 
 float stateMachine::loopStateAIRBORNE(unsigned long currentTimestamp, long diffTime) {
@@ -281,9 +281,9 @@ void stateMachine::loopStateAIRBORNE_ASCENTToAIRBORNE_DESCENT(unsigned long time
   debug(F(""));
 
   if (_loopStateChangedFunc != nullptr)
-    _loopStateChangedFunc(STATEMACHINE_AIRBORNE_DESCENT, _loopState, timestamp, deltaElapsed);
+    _loopStateChangedFunc(FLIGHT_STATE_AIRBORNE_DESCENT, _loopState, timestamp, deltaElapsed);
 
-  _loopState = STATEMACHINE_AIRBORNE_DESCENT;
+  _loopState = FLIGHT_STATE_AIRBORNE_DESCENT;
 }
 
 void stateMachine::loopStateAIRBORNE_DESCENT(unsigned long timestamp, unsigned long deltaElapsed) {
@@ -353,9 +353,9 @@ void stateMachine::loopStateAIRBORNE_DESCENTToLANDED(unsigned long timestamp, un
   debug(F(""));
 
   if (_loopStateChangedFunc != nullptr)
-    _loopStateChangedFunc(STATEMACHINE_LANDED, _loopState, timestamp, deltaElapsed);
+    _loopStateChangedFunc(FLIGHT_STATE_LANDED, _loopState, timestamp, deltaElapsed);
 
-  _loopState = STATEMACHINE_LANDED;
+  _loopState = FLIGHT_STATE_LANDED;
 }
 
 void stateMachine::loopStateLANDED(unsigned long timestamp, unsigned long deltaElapsed) {
@@ -402,9 +402,9 @@ void stateMachine::loopStateLANDEDToGROUND(unsigned long timestamp, unsigned lon
   debug(F(""));
 
   if (_loopStateChangedFunc != nullptr)
-    _loopStateChangedFunc(STATEMACHINE_GROUND, _loopState, timestamp, deltaElapsed);
+    _loopStateChangedFunc(FLIGHT_STATE_GROUND, _loopState, timestamp, deltaElapsed);
 
-  _loopState = STATEMACHINE_GROUND;
+  _loopState = FLIGHT_STATE_GROUND;
   _countdownAborted = 0;
   _countdownLanded = 0;
 
@@ -505,9 +505,9 @@ void stateMachine::loopStateGROUNDToAIRBORNE_ASCENT(unsigned long timestamp, uns
   // drawTftFlightAirborneStart();
 
   if (_loopStateChangedFunc != nullptr)
-    _loopStateChangedFunc(STATEMACHINE_AIRBORNE_ASCENT, _loopState, timestamp, deltaElapsed);
+    _loopStateChangedFunc(FLIGHT_STATE_AIRBORNE_ASCENT, _loopState, timestamp, deltaElapsed);
 
-  _loopState = STATEMACHINE_AIRBORNE_ASCENT;
+  _loopState = FLIGHT_STATE_AIRBORNE_ASCENT;
 }
 
 void stateMachine::preferencesOutput() {
@@ -674,7 +674,7 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
   return 0;
 }
 
-loopStates stateMachine::state() {
+flightStates stateMachine::state() {
   return _loopState;
 }
 

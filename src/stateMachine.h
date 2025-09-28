@@ -2,6 +2,7 @@
 #define _STATE_MACHINE_H
 
 #include <buttonHandlerBase.h>
+#include <flightData.h>
 #include <flightLog.h>
 #include <loopThrottle.h>
 #include "sensors.h"
@@ -12,17 +13,9 @@
 #define PREFERENCE_KEY_ALTITUDE_LIFTOFF "smAL"
 #define PREFERENCE_KEY_LAUNCH_DETECT "smLD"
 
-enum loopStates {
-  STATEMACHINE_ABORTED = 100,
-  STATEMACHINE_AIRBORNE_ASCENT = 101,
-  STATEMACHINE_AIRBORNE_DESCENT = 1022,
-  STATEMACHINE_GROUND = 103,
-  STATEMACHINE_LANDED = 104
-};
-
-typedef void (*StateMachineStateFunctionPtr)(loopStates state, unsigned long timestamp, unsigned long deltaElapsed);
-typedef void (*StateMachineStateChangedFunctionPtr)(loopStates state, loopStates stateFrom, unsigned long timestamp, unsigned long deltaElapsed);
-typedef void (*StateMachineStateThottledFunctionPtr)(loopStates state, unsigned long timestamp, unsigned long deltaElapsed);
+typedef void (*StateMachineStateFunctionPtr)(flightStates state, unsigned long timestamp, unsigned long deltaElapsed);
+typedef void (*StateMachineStateChangedFunctionPtr)(flightStates state, flightStates stateFrom, unsigned long timestamp, unsigned long deltaElapsed);
+typedef void (*StateMachineStateThottledFunctionPtr)(flightStates state, unsigned long timestamp, unsigned long deltaElapsed);
 typedef void (*StateMachineLedBlinkFunctionPtr)(unsigned long delta, int state);
 
 struct stateMachineDefaultsStruct {
@@ -48,7 +41,7 @@ class stateMachine {
     void reset();
     void save(int launchDetect, int sampleRateAirborneAscent, int sampleRateAirborneDecent, int sampleRateGround);
     byte setup(flightLog* flightLog, sensors* sensors, StateMachineStateFunctionPtr stateFunc, StateMachineStateThottledFunctionPtr stateThrottledFunc, StateMachineStateChangedFunctionPtr stateChangedFunc);
-    loopStates state();
+    flightStates state();
 
     int launchDetect();
     void preferencesOutput();
@@ -83,7 +76,7 @@ class stateMachine {
     int _countdownAborted = 0;
     int _countdownLanded = 0;
     flightLog* _flightLog;
-    loopStates _loopState = STATEMACHINE_GROUND;
+    flightStates _loopState = FLIGHT_STATE_GROUND;
     StateMachineStateFunctionPtr _loopStatedFunc;
     StateMachineStateChangedFunctionPtr _loopStateChangedFunc;
     StateMachineStateThottledFunctionPtr _loopStateThrottledFunc;

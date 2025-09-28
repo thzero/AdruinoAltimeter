@@ -15,16 +15,21 @@ class flightLog {
     bool airborne = false;
     bool aborted;
     float altitudeInitial;
+    flightDataTraceStruct current;
     float humidityInitial;
     // Number of measures to do so that we are sure that apogee has been reached
     unsigned long measures = 5;
     float pressureInitial;
     bool recording;
+    uint8_t state;
+    char *stateName;
     float temperatureInitial;
     bool touchdown = false;
 
   protected:
     flightLoggerBase* _instance;
 };
+
+extern flightLog _flightLog;
 
 #endif
