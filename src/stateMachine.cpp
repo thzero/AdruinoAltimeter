@@ -435,18 +435,9 @@ void stateMachine::loopStateToGROUND(unsigned long timestamp, unsigned long delt
 
 void stateMachine::loopStateGROUND(unsigned long timestamp, unsigned long deltaElapsed) {
   // Serial.printf(F("...loopStateGROUND... %d\n"), deltaElapsed);
-  // Only blink while on the ground!
-  // _neoPixelBlinker.blink(timestamp, 500);
 
   if (_loopStatedFunc != nullptr)
     _loopStatedFunc(_loopState, timestamp, deltaElapsed);
-
-  // networkLoop();
-
-  // battery
-  // voltage = analogReadMilliVolts(10)/500;
-  // memmove(&voltage[0], &voltage[1], (voltage_array_capacity - 1) * sizeof(voltage[0]));
-  // voltage[voltage_array_capacity - 1] = analogReadMilliVolts(10)/500;
 
   // Determine the ground loop time delay based on sampling rate.
   unsigned long delta = _throttleGround.determine('g', deltaElapsed, _sampleRateGround);
