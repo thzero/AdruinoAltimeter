@@ -1,31 +1,39 @@
 #ifndef _SENSOR_H
 #define _SENSOR_H
 
-#include "sensorBase.h"
-#include "sensorData.h"
-// #include <sensorBMP280.h>
-#include <sensorBME280.h>
-#include <sensorMPU6050.h>
+#include <sensorBase.h>
+#include <sensorBarometer.h>
+#include <sensorData.h>
+#include <sensorGPS.h>
+#include <sensorIMU.h>
 
-extern byte setupSensors();
+struct sensorsSetupResults {
+  byte atmosphere = 0;
+  byte gps = 0;
+  byte imu = 0;
+  byte sensors = 0;
+};
+
 extern void setupSensorsCompleted();
+extern sensorsSetupResults setupSensorsStart();
 
 class sensors {
   public:
     sensorValuesStruct initialize();
     float readAltitude();
     float readAltitude(atmosphereValues values);
-    atmosphereValues readAtmosphere();
-    accelerometerValues readAccelerometer();
-    gyroscopeValues readGyroscope();
+    void readAccelerometer(sensorValuesStruct* data);
+    void readAtmosphere(sensorValuesStruct* data);
+    void readGps(sensorValuesStruct* data);
+    void readGyroscope(sensorValuesStruct* data);
     void sleep();
-    byte setup(sensorBase* atmosphereSensor, sensorBase* imuSensor);
+    sensorsSetupResults setup(sensorBarometer* atmosphereSensor, sensorIMU* imuSensor, sensorGPS* gps);
     void setupCompleted();
     void calibrationResetCommand(uint8_t* commandBuffer, uint16_t commandBufferLength);
   private:
-    sensorBase* _atmosphereSensor;
-    // sensorIMU _imuSensor;
-    sensorBase* _imuSensor;
+    sensorBarometer* _atmosphereSensor;
+    sensorGPS* _gps;
+    sensorIMU* _imuSensor;
     bool _initialized;
 };
 

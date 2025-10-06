@@ -16,6 +16,7 @@ class flightLog {
     bool aborted;
     float altitudeInitial;
     flightDataTraceStruct current;
+    flightDataTransferStruct current2;
     float humidityInitial;
     // Number of measures to do so that we are sure that apogee has been reached
     unsigned long measures = 5;

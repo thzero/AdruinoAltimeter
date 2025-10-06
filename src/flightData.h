@@ -64,10 +64,47 @@ struct __attribute__((packed)) flightDataTransferGyroscopeValues {
   float z;
 };
 
+struct __attribute__((packed)) flightDataTransferGPSValues {
+  float altitude;
+  float altitudeFiltered;
+  bool altitudeValid;
+  float altitudeMSL;
+  float altitudeMSLFiltered;
+  bool altitudeMSLValid;
+  float altitudeGeoidSep;
+  float altitudeGeoidSepFiltered;
+  bool altitudeGeoidSepValid;
+  bool fix;
+  bool fixValid;
+  int fixAge;
+  int fixAgeFiltered;
+  bool fixAgeValid;
+  float hdop;
+  float hdopFiltered;
+  bool hdopValid;
+  float latitude;
+  float latitudeFiltered;
+  bool latitudeValid;
+  float longitude;
+  float longitudeFiltered;
+  bool longitudeValid;
+  float pdop;
+  float pdopFiltered;
+  bool pdopValid;
+  int satellites;
+  int satellitesFiltered;
+  bool satellitesValid;
+  float vdop;
+  float vdopFiltered;
+  bool vdopValid;
+};
+
 struct __attribute__((packed)) flightDataTransferStruct {
+  long diffTime;
   uint8_t state;
   flightDataTransferAccelerometerValues acceleration;
   flightDataTransferAtmosphereValues atmosphere;
+  flightDataTransferGPSValues gps;
   flightDataTransferGyroscopeValues gyroscope;
 };
 
