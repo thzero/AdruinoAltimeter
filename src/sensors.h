@@ -1,5 +1,5 @@
-#ifndef _SENSOR_H
-#define _SENSOR_H
+#ifndef _SENSORS_H
+#define _SENSORS_H
 
 #include <sensorBase.h>
 #include <sensorBarometer.h>
