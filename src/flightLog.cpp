@@ -116,3 +116,5 @@ byte flightLog::setup(flightLoggerBase* instance, deviceCommands* deviceCommands
 
   return 0;
 }
+
+flightLog _flightLog;
