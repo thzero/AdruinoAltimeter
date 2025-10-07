@@ -41,13 +41,13 @@ struct flightDataTraceStruct {
   float velocity;
 };
 
-struct __attribute__((packed)) flightDataTransferAccelerometerValues {
+struct __attribute__((packed)) flightDataAccelerometerValues {
   float x;
   float y;
   float z;
 };
 
-struct __attribute__((packed)) flightDataTransferAtmosphereValues {
+struct __attribute__((packed)) flightDataAtmosphereValues {
   float altitude;
   float altitudeInitial;
   float humidity;
@@ -58,13 +58,13 @@ struct __attribute__((packed)) flightDataTransferAtmosphereValues {
   float temperatureInitial;
 };
 
-struct __attribute__((packed)) flightDataTransferGyroscopeValues {
+struct __attribute__((packed)) flightDataGyroscopeValues {
   float x;
   float y;
   float z;
 };
 
-struct __attribute__((packed)) flightDataTransferGPSValues {
+struct __attribute__((packed)) flightDataGPSValues {
   float altitude;
   float altitudeFiltered;
   bool altitudeValid;
@@ -99,13 +99,13 @@ struct __attribute__((packed)) flightDataTransferGPSValues {
   bool vdopValid;
 };
 
-struct __attribute__((packed)) flightDataTransferStruct {
+struct __attribute__((packed)) flightDataTraceStruct2 {
   long diffTime;
   uint8_t state;
-  flightDataTransferAccelerometerValues acceleration;
-  flightDataTransferAtmosphereValues atmosphere;
-  flightDataTransferGPSValues gps;
-  flightDataTransferGyroscopeValues gyroscope;
+  flightDataAccelerometerValues acceleration;
+  flightDataAtmosphereValues atmosphere;
+  flightDataGPSValues gps;
+  flightDataGyroscopeValues gyroscope;
 };
 
 struct flightMinAndMaxStruct {

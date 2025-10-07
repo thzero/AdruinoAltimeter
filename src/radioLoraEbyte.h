@@ -6,14 +6,14 @@
 #include <limits.h>
 #include <EBYTE.h>
 
-#include "radioLora.h"
-#include "radioLoraEbyte.h"
+#include "radioLoRa.h"
+#include "radioLoRaEbyte.h"
 
 // #define DEBUG
 
-class radioLoraEbyte: public radioLora {
+class radioLoRaEbyte: public radioLoRa {
   public:
-    radioLoraEbyte() {
+    radioLoRaEbyte() {
     }
 
     void process(unsigned long timestamp, unsigned long delta) override;

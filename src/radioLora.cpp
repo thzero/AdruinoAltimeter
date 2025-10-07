@@ -1,6 +1,6 @@
-#include "radioLora.h"
+#include "radioLoRa.h"
 
-byte radioLora::setup(HardwareSerial* port, uint8_t pin_m0, uint8_t pin_m1, uint8_t pin_aux, int baud) {
+byte radioLoRa::setup(HardwareSerial* port, uint8_t pin_m0, uint8_t pin_m1, uint8_t pin_aux, int baud) {
     if (port == nullptr)
         return 1;
 
