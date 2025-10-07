@@ -1,6 +1,8 @@
 #ifndef _FLIGHT_DATA_H
 #define _FLIGHT_DATA_H
 
+#include <stdint.h>
+
 enum flightStates {
   FLIGHT_STATE_ABORTED = 100,
   FLIGHT_STATE_AIRBORNE_ASCENT = 101,
