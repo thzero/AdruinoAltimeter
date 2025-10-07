@@ -1,8 +1,8 @@
-#include "radioLora.h"
-#include "radioLoraEbyte.h"
+#include "radioLoRa.h"
+#include "radioLoRaEbyte.h"
 
-byte radioLoraEbyte::setup(HardwareSerial* port, uint8_t pin_m0, uint8_t pin_m1, uint8_t pin_aux, int baud) {
-    byte results = radioLora::setup(port, pin_m0, pin_m1, pin_aux, baud);
+byte radioLoRaEbyte::setup(HardwareSerial* port, uint8_t pin_m0, uint8_t pin_m1, uint8_t pin_aux, int baud) {
+    byte results = radioLoRa::setup(port, pin_m0, pin_m1, pin_aux, baud);
     if (results > 0)
         return results;
 
@@ -17,11 +17,11 @@ byte radioLoraEbyte::setup(HardwareSerial* port, uint8_t pin_m0, uint8_t pin_m1,
     }
 
     int baudRate = _lora.GetUARTBaudRate();
-    Serial.printf(F("radioLoraEbyte::setup.baudRate: %d"), baudRate);
+    Serial.printf(F("radioLoRaEbyte::setup.baudRate: %d"), baudRate);
     _baud = 1200;
     if (baudRate > 0)
         _baud = 1200 * (1 << 5);
-    Serial.printf(F("radioLoraEbyte::setup._baud: %d"), _baud);
+    Serial.printf(F("radioLoRaEbyte::setup._baud: %d"), _baud);
 
     // you can print all parameters and is good for debugging
     // if your units will not communicate, print the parameters
@@ -34,13 +34,13 @@ byte radioLoraEbyte::setup(HardwareSerial* port, uint8_t pin_m0, uint8_t pin_m1,
     return 0;
 }
 
-void radioLoraEbyte::process(unsigned long timestamp, unsigned long delta) {
+void radioLoRaEbyte::process(unsigned long timestamp, unsigned long delta) {
 }
 
-void radioLoraEbyte::write(char* chars) {
+void radioLoRaEbyte::write(char* chars) {
     _port->write(chars);
 }
 
-void radioLoraEbyte::write(uint8_t* byteArray, size_t length) {
+void radioLoRaEbyte::write(uint8_t* byteArray, size_t length) {
     _port->write(byteArray, length);
 }

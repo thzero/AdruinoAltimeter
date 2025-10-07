@@ -7,9 +7,9 @@
 
 // #define DEBUG
 
-class radioLora {
+class radioLoRa {
   public:
-    radioLora() {
+    radioLoRa() {
     }
 
     virtual void process(unsigned long timestamp, unsigned long delta);
