@@ -17,11 +17,11 @@ byte radioLoRaEbyte::setup(HardwareSerial* port, uint8_t pin_m0, uint8_t pin_m1,
     }
 
     int baudRate = _lora.GetUARTBaudRate();
-    Serial.printf(F("radioLoRaEbyte::setup.baudRate: %d"), baudRate);
+    Serial.printf(F("radioLoRaEbyte::setup.baudRate: %d\n"), baudRate);
     _baud = 1200;
     if (baudRate > 0)
         _baud = 1200 * (1 << 5);
-    Serial.printf(F("radioLoRaEbyte::setup._baud: %d"), _baud);
+    Serial.printf(F("radioLoRaEbyte::setup._baud: %d\n"), _baud);
 
     // you can print all parameters and is good for debugging
     // if your units will not communicate, print the parameters

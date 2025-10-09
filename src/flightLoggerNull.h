@@ -24,6 +24,6 @@ class flightLoggerNull : public flightLoggerBase {
     bool writeFlightCurrent() override;
 };
 
-extern void setupFlightLog(deviceCommands* commands);
+extern byte setupFlightLog(deviceCommands* commands);
 
 #endif

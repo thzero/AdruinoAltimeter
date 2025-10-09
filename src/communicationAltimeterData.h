@@ -2,6 +2,7 @@
 #define _COMMUNICATION_ALTIMETER_DATA_H
 
 #include "flightData.h"
+#include "settings.h"
 
 struct __attribute__((packed)) communicationMonitorDataStruct {
   float cpuTemp = 0.0;
@@ -14,7 +15,7 @@ struct __attribute__((packed)) communicationMonitorDataStruct {
 
 struct __attribute__((packed)) communicationExternalStruct {
   long diffTime;
-  uint8_t state;
+  uint8_t state;  // can't use flightStates, as it messes up the memcopy
   flightDataAccelerometerValues acceleration;
   flightDataAtmosphereValues atmosphere;
   flightDataGPSValues gps;
@@ -30,6 +31,7 @@ struct __attribute__((packed)) communicationInternalStruct {
   flightDataGPSValues gps;
   flightDataGyroscopeValues gyroscope;
   communicationMonitorDataStruct monitor;
+  settingsStruct settings;
 };
 
 #endif

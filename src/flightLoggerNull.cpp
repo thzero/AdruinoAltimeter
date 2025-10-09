@@ -49,11 +49,8 @@ bool flightLoggerNull::writeFlightCurrent() {
 }
 
 flightLoggerNull _flightLoggerNull;
-void setupFlightLog(deviceCommands* commands) {
-  Serial.println(F("Setup flight log commands..."));
-
+byte setupFlightLog(deviceCommands* commands) {
   _flightLog.setup(&_flightLoggerNull, commands);
 
-  Serial.println(F("...setup flight log commands finished."));
-  Serial.println();
+  return 0;
 }
