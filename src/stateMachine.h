@@ -1,5 +1,5 @@
-#ifndef _STATE_MACHINE_MAIN_H
-#define _STATE_MACHINE_MAIN_H
+#ifndef _STATE_MACHINE_H
+#define _STATE_MACHINE_H
 
 #include <ArduinoJson.h>
 
@@ -9,6 +9,7 @@
 #include <loopThrottle.h>
 #include "sensors.h"
 #include "settings.h"
+#include "stateMachineConstants.h"
 
 #define ALTITUDE_LIFTOFF 20
 
@@ -69,7 +70,7 @@ class stateMachine {
     void save(int altitudeLiftoff, int sampleRateAirborneAscent, int sampleRateAirborneDecent, int sampleRateGround);
     byte setup(flightLog* flightLog, sensors* sensors, StateMachineStateFunctionPtr stateFunc = nullptr, StateMachineStateThottledFunctionPtr stateThrottledFunc = nullptr, StateMachineStateChangedFunctionPtr stateChangedFunc = nullptr, StateMachinePreferenceLoadFunctionPtr stateLoadFunc = nullptr, StateMachinePreferenceSaveFunctionPtr stateSaveFunc = nullptr);
     flightStates state();
-    char * stateName();
+    const char * stateName();
 
     int altitudeLiftoff();
     void preferencesOutput();

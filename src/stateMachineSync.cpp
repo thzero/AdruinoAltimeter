@@ -61,8 +61,8 @@ flightStates stateMachineSync::state() {
   return _loopState;
 }
 
-char* stateMachineSync::stateName() {
-  char* name;
+const char* stateMachineSync::stateName() {
+  const char* name;
   name = "";
   if (_loopState == FLIGHT_STATE_ABORTED)
     name = "Aborted";

@@ -692,8 +692,8 @@ flightStates stateMachine::state() {
   return _loopState;
 }
 
-char* stateMachine::stateName() {
-  char* name;
+const char* stateMachine::stateName() {
+  const char* name;
   name = "";
   if (_loopState == FLIGHT_STATE_ABORTED)
     name = "Aborted";
