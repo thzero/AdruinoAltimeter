@@ -22,8 +22,6 @@ class flightLog {
     unsigned long measures = 5;
     float pressureInitial;
     bool recording;
-    uint8_t state;
-    char *stateName;
     float temperatureInitial;
     bool touchdown = false;
 

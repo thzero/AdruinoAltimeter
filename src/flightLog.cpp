@@ -28,15 +28,17 @@ void flightLog::reset() {
 }
 
 byte flightLog::setup(flightLoggerBase* instance, deviceCommands* deviceCommands) {
-  Serial.println(F("Setup flight logger..."));
+  Serial.println(F("Setup flight log..."));
 
   _instance = instance;
   if (_instance == nullptr)
-    return 2;
+    return 1;
   if (!_instance->initFileSystem()) {
-    Serial.println(F("Failed to initialize flight logger"));
+    Serial.println(F("...failed to initialize flight log."));
     return 2;
   }
+
+  Serial.println(F("\tSetup flight log commands..."));
 
   if (deviceCommands != nullptr) {
     // TODO: setup flight log commands...
@@ -58,60 +60,60 @@ byte flightLog::setup(flightLoggerBase* instance, deviceCommands* deviceCommands
     //   Serial.println(F("x;\tdelete last recorded flight log"));
     //   Serial.println(F("z;\treindex recorded flight log index"));
 
+    // output to serial all flight logs
+    // if (command == 'a') {
+    //   handleFightsOutputSerial(commandBuffer);
+    //   return;
+    // }
+    // erase all recorded flight logs
+    // if (command == 'e') {
+    //   _flightLog._instance->eraseFlights();
+    //   return;
+    // }
+    // // output to seriali a list of all flight logs
+    // if (command == 'l') {
+    //   handleFlightsListing(commandBuffer);
+    //   return;
+    // }
+    // // output to serial the number of recorded flight logs
+    // if (command == 'n') {
+    //   handleFlightsNumberNax(commandBuffer);
+    //   return;
+    // }
+    // if (command == 'p') {
+    //   handlesPreferenceOutput(commandBuffer);
+    //   return;
+    // }
+    // // output to serial data for the specified flight log
+    // if (command == 'r') {
+    //   handleFlightOutputSerial(commandBuffer);
+    //   return;
+    // }
+    // // toggle flight log telemetry
+    // if (command == 't') {
+    //   // not implemented
+    //   return;
+    // }
+    // // delete last recorded flight log
+    // if (command == 'x') {
+    //   _flightLog._instance->eraseLast();
+    //   return;
+    // }
+    // // reindex recorded flight log index
+    // if (command == 'z') {
+    //   _flightLog._instance->reindexFlights();
+    //   return;
+    // }
 
-      // output to serial all flight logs
-      // if (command == 'a') {
-      //   handleFightsOutputSerial(commandBuffer);
-      //   return;
-      // }
-      // erase all recorded flight logs
-      // if (command == 'e') {
-      //   _flightLog._instance->eraseFlights();
-      //   return;
-      // }
-      // // output to seriali a list of all flight logs
-      // if (command == 'l') {
-      //   handleFlightsListing(commandBuffer);
-      //   return;
-      // }
-      // // output to serial the number of recorded flight logs
-      // if (command == 'n') {
-      //   handleFlightsNumberNax(commandBuffer);
-      //   return;
-      // }
-      // if (command == 'p') {
-      //   handlesPreferenceOutput(commandBuffer);
-      //   return;
-      // }
-      // // output to serial data for the specified flight log
-      // if (command == 'r') {
-      //   handleFlightOutputSerial(commandBuffer);
-      //   return;
-      // }
-      // // toggle flight log telemetry
-      // if (command == 't') {
-      //   // not implemented
-      //   return;
-      // }
-      // // delete last recorded flight log
-      // if (command == 'x') {
-      //   _flightLog._instance->eraseLast();
-      //   return;
-      // }
-      // // reindex recorded flight log index
-      // if (command == 'z') {
-      //   _flightLog._instance->reindexFlights();
-      //   return;
-      // }
 
+    // _deviceCommands.initCommand('d', _diagnosticsDisplay, true, "d", "display the diagnostics");
+    // _deviceCommands.initCommand('j', _diagnosticsToggle, true, "j", "toggle the diagnostics");
+    // _deviceCommands.initCommand('$', rtcTimestampCommand, true, "$<unsigned long>", "set the time");
+    // _deviceCommands.initCommand('@', calibrationSensorsResetCommand, true, "@", "recalibrate the gyro");
+  }
+  Serial.println(F("\t...setup flight log commands finished."));
 
-      // _deviceCommands.initCommand('d', _diagnosticsDisplay, true, "d", "display the diagnostics");
-      // _deviceCommands.initCommand('j', _diagnosticsToggle, true, "j", "toggle the diagnostics");
-      // _deviceCommands.initCommand('$', rtcTimestampCommand, true, "$<unsigned long>", "set the time");
-      // _deviceCommands.initCommand('@', calibrationSensorsResetCommand, true, "@", "recalibrate the gyro");
-    }
-
-  Serial.println(F("...flight logger successful."));
+  Serial.println(F("...flight log successful."));
   Serial.println();
 
   return 0;
