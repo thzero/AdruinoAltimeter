@@ -2,6 +2,7 @@
 #define _FLIGHT_LOG_H
 
 #include <commands.h>
+
 #include "flightData.h"
 #include "flightLoggerBase.h"
 
