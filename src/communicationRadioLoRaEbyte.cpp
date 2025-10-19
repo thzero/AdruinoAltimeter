@@ -1,11 +1,17 @@
 #include "CommunicationRadioLoRaEbyte.h"
 
-byte CommunicationRadioLoRaEbyte::setup(HardwareSerial* port, uint8_t pin_m0, uint8_t pin_m1, uint8_t pin_aux, int baud) {
-    byte results = CommunicationRadioLoRa::setup(port, pin_m0, pin_m1, pin_aux, baud);
+byte CommunicationRadioLoRaEbyte::setup(HardwareSerial* port, uint8_t pin_m0, uint8_t pin_m1, uint8_t pin_aux, int address, int networkId, int baud) {
+    byte results = CommunicationRadioLoRa::setup(port, address, networkId, baud);
     if (results > 0)
         return results;
 
     Serial.println(F("\tSetup communication radio LORA transceiver..."));
+
+    if (_port == nullptr)
+         return 1;
+
+    _port->end();
+    _port->begin(9600);
 
     bool found = _lora.init(_port, pin_m0, pin_m1, pin_aux, &Serial);
     Serial.print(F("Communication radio LORA transceiver found: "));
@@ -40,15 +46,39 @@ byte CommunicationRadioLoRaEbyte::setup(HardwareSerial* port, uint8_t pin_m0, ui
     return 0;
 }
 
+int CommunicationRadioLoRaEbyte::available() {
+    if (_port == nullptr) {
+        Serial.println("Error: no port setup for the LoRa radio.");
+        return false;
+    }
+    return _port->available();
+}
+
+int CommunicationRadioLoRaEbyte::read() {
+    if (_port == nullptr) {
+        Serial.println("Error: no port setup for the LoRa radio.");
+        return 0;
+    }
+    return _port->read();
+}
+
 void CommunicationRadioLoRaEbyte::writeBytes(uint8_t* byteArray, size_t length) {
     if (_port == nullptr) {
         Serial.println("Error: no port setup for the LoRa radio.");
         return;
     }
+
+    Serial.print(F("CommunicationRadioLoRaEbyte::writeBytes: buffer length: "));
+    Serial.println(length);
+    Serial.println(F("CommunicationRadioLoRaEbyte::writeBytes: message bytes to send: "));
+    for (size_t i = 0; i < length; i++)
+        Serial.printf(F("%d "), byteArray[i]);
+    Serial.println();
+
     _port->write(byteArray, length);
 }
 
-void CommunicationRadioLoRaEbyte::writeChars(char* chars) {
+void CommunicationRadioLoRaEbyte::writeChars(const char* chars) {
     if (_port == nullptr) {
         Serial.println("Error: no port setup for the LoRa radio.");
         return;

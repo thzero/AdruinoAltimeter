@@ -15,9 +15,11 @@ class CommunicationRadioLoRaEbyte: public CommunicationRadioLoRa {
     CommunicationRadioLoRaEbyte() {
     }
 
-    byte setup(HardwareSerial* port, uint8_t pin_m0 = 4, uint8_t pin_m1 = 5, uint8_t pin_aux = -1, int baud = -1) override;
+    byte setup(HardwareSerial* port, uint8_t pin_m0 = 4, uint8_t pin_m1 = 5, uint8_t pin_aux = -1, int address = -1, int networkId = -1, int baud = -1);
+    int available() override;
+    int read() override;
     void writeBytes(uint8_t* byteArray, size_t length) override;
-    void writeChars(char* chars) override;
+    void writeChars(const char* chars) override;
   private:
     EBYTE _lora;
 };

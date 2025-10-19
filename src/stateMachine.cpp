@@ -177,7 +177,7 @@ float stateMachine::loopStateAIRBORNE(unsigned long currentTimestamp, long diffT
 //   _flightLogger.instance.setAltitudeLast(altitude);
 //   _flightLogger.instance.setTimestampPrevious(currentTimestamp);
 
-//   // sendTelemetry(timestamp - _flightLogger.instance.getData().timestampInitial , atmosphere, accelerometer, gryoscope, altitude, diffTime);
+//   // sendTelemetry(timestamp - _flightLogger.instance.getData().timestampInitial , atmosphere, accelerometer, gyroscope, altitude, diffTime);
 
 //   drawTftFlightAirborne(currentTimestamp, diffTime);
 

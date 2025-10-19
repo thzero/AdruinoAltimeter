@@ -13,16 +13,6 @@ struct __attribute__((packed)) communicationMonitorDataStruct {
   float voltage = 0.0;
 };
 
-struct __attribute__((packed)) communicationExternalStruct {
-  long diffTime;
-  uint8_t state;  // can't use flightStates, as it messes up the memcopy
-  flightDataAccelerometerValues acceleration;
-  flightDataAtmosphereValues atmosphere;
-  flightDataGPSValues gps;
-  flightDataGyroscopeValues gyroscope;
-  communicationMonitorDataStruct monitor;
-};
-
 struct __attribute__((packed)) communicationInternalStruct {
   long diffTime;
   uint8_t state;
@@ -30,8 +20,10 @@ struct __attribute__((packed)) communicationInternalStruct {
   flightDataAtmosphereValues atmosphere;
   flightDataGPSValues gps;
   flightDataGyroscopeValues gyroscope;
+  flightDataMagnetometerValues magnetometer;
   communicationMonitorDataStruct monitor;
   settingsStruct settings;
+  flightDataVelocityValues velocity;
 };
 
 #endif

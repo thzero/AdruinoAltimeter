@@ -60,12 +60,6 @@ struct __attribute__((packed)) flightDataAtmosphereValues {
   float temperatureInitial;
 };
 
-struct __attribute__((packed)) flightDataGyroscopeValues {
-  float x;
-  float y;
-  float z;
-};
-
 struct __attribute__((packed)) flightDataGPSValues {
   float altitude;
   float altitudeFiltered;
@@ -76,11 +70,13 @@ struct __attribute__((packed)) flightDataGPSValues {
   float altitudeGeoidSep;
   float altitudeGeoidSepFiltered;
   bool altitudeGeoidSepValid;
-  bool fix;
+  int8_t fix;
   bool fixValid;
-  int fixAge;
-  int fixAgeFiltered;
+  int32_t fixAge;
+  int32_t fixAgeFiltered;
   bool fixAgeValid;
+  int8_t fixType;
+  bool fixTypeValid;
   float hdop;
   float hdopFiltered;
   bool hdopValid;
@@ -93,12 +89,30 @@ struct __attribute__((packed)) flightDataGPSValues {
   float pdop;
   float pdopFiltered;
   bool pdopValid;
-  int satellites;
-  int satellitesFiltered;
+  uint16_t satellites;
+  uint16_t satellitesFiltered;
   bool satellitesValid;
   float vdop;
   float vdopFiltered;
   bool vdopValid;
+};
+
+struct __attribute__((packed)) flightDataGyroscopeValues {
+  float x;
+  float y;
+  float z;
+};
+
+struct __attribute__((packed)) flightDataMagnetometerValues {
+  float x;
+  float y;
+  float z;
+};
+
+struct __attribute__((packed)) flightDataVelocityValues {
+  float x;
+  float y;
+  float z;
 };
 
 struct __attribute__((packed)) flightDataTraceStruct2 {
@@ -108,6 +122,8 @@ struct __attribute__((packed)) flightDataTraceStruct2 {
   flightDataAtmosphereValues atmosphere;
   flightDataGPSValues gps;
   flightDataGyroscopeValues gyroscope;
+  flightDataMagnetometerValues magnetometer;
+  flightDataVelocityValues velocity;
 };
 
 struct flightMinAndMaxStruct {
