@@ -23,7 +23,7 @@ struct __attribute__((packed)) communicationInternalStruct {
   flightDataMagnetometerValues magnetometer;
   communicationMonitorDataStruct monitor;
   settingsStruct settings;
-  flightDatVelocityValues velocity;
+  flightDataVelocityValues velocity;
 };
 
 #endif

@@ -109,7 +109,7 @@ struct __attribute__((packed)) flightDataMagnetometerValues {
   float z;
 };
 
-struct __attribute__((packed)) flightDatVelocityValues {
+struct __attribute__((packed)) flightDataVelocityValues {
   float x;
   float y;
   float z;
@@ -121,8 +121,9 @@ struct __attribute__((packed)) flightDataTraceStruct2 {
   flightDataAccelerometerValues acceleration;
   flightDataAtmosphereValues atmosphere;
   flightDataGPSValues gps;
+  flightDataGyroscopeValues gyroscope;
   flightDataMagnetometerValues magnetometer;
-  flightDatVelocityValues velocity;
+  flightDataVelocityValues velocity;
 };
 
 struct flightMinAndMaxStruct {
