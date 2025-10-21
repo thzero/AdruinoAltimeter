@@ -83,7 +83,7 @@ void CommunicationMAVLink::sendHeartbeat(uint8_t type, uint8_t state, uint8_t mo
         return;
     }
 
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_MAVLINK
     Serial.println(F("communication-mavlink-heartbeat..."));
 #endif
 
@@ -118,7 +118,7 @@ void CommunicationMAVLink::sendGPSFiltered(uint64_t time_usec, int32_t lat, int3
         return;
     }
 
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_MAVLINK
     Serial.println(F("communication-mavlink-gpsf..."));
 #endif
 
@@ -134,7 +134,7 @@ void CommunicationMAVLink::sendGPSRaw(uint64_t time_usec, int32_t lat, int32_t l
         return;
     }
 
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_MAVLINK
     Serial.println(F("communication-mavlink-gpsr..."));
 #endif
 
@@ -151,7 +151,7 @@ void CommunicationMAVLink::sendIMU(uint64_t time_usec, int16_t xacc, int16_t yac
         return;
     }
 
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_MAVLINK
     Serial.println(F("communication-mavlink-imu..."));
 #endif
 
@@ -167,7 +167,7 @@ void CommunicationMAVLink::sendSensors(uint64_t time_usec, sensorValuesStruct se
         return;
     }
 
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_MAVLINK
     Serial.println(F("communication-mavlink-sensor..."));
 #endif
 
@@ -189,7 +189,7 @@ void CommunicationMAVLink::sendSensorsBarometerAltitude(uint64_t time_usec, sens
         return;
     }
 
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_MAVLINK
     Serial.println(F("communication-mavlink-sensor-barometer..."));
 #endif
 
@@ -206,7 +206,7 @@ void CommunicationMAVLink::_handleHeartbeat(const mavlink_message_t* message) {
     mavlink_heartbeat_t hb;
     mavlink_msg_heartbeat_decode(message, &hb);
 
-#ifdef DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION_MAVLINK
     Serial.println(F("communication-mavlink-heartbeat-received..."));
     Serial.print(F("MAV_STATE_STANDBY: ")); Serial.println(MAV_STATE_STANDBY);
     Serial.print(F("MAV_STATE_ACTIVE: ")); Serial.println(MAV_STATE_ACTIVE);
@@ -238,7 +238,7 @@ void CommunicationMAVLink::_write(mavlink_message_t* message) {
     uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
     uint16_t length = mavlink_msg_to_send_buffer(buffer, message);
 
-#if defined(DEBUG_COMMUNICATION) && defined(DEBUG_COMMUNICATION_SEND)
+#if defined(DEBUG_COMMUNICATION_MAVLINK) && defined(DEBUG_COMMUNICATION_MAVLINK_SEND)
     // Serial.print(F("communication-mavlink-send: buffer length: "));
     // Serial.println(length);
     // Serial.println(F("communication-mavlink-send: message bytes to send: "));

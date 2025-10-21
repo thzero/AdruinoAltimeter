@@ -10,6 +10,7 @@ class CommunicationRadio {
 
     virtual int available();
     virtual int read();
+    virtual size_t read(CommunicationHandlerFunctionPtr func, unsigned long timestamp, unsigned long delta);
     virtual void writeBytes(uint8_t* byteArray, size_t length);
     virtual void writeChars(const char* chars);
 };

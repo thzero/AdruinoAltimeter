@@ -20,3 +20,76 @@ byte CommunicationRadioLoRa::setup(HardwareSerial* port, int address, int networ
     
     return 0;
 }
+
+int CommunicationRadioLoRa::available() {
+    if (_port == nullptr) {
+        Serial.println("Error: no port setup for the LoRa radio.");
+        return false;
+    }
+
+    return _port->available();
+}
+
+int CommunicationRadioLoRa::read() {
+    if (_port == nullptr) {
+        Serial.println("Error: no port setup for the LoRa radio.");
+        return 0;
+    }
+    return _port->read();
+}
+
+size_t CommunicationRadioLoRa::read(CommunicationHandlerFunctionPtr func, unsigned long timestamp, unsigned long delta) {
+    if (_port == nullptr) {
+        Serial.println("Error: no port setup for the LoRa radio.");
+        return -1;
+    }
+
+    if (_port->available() <= 0)
+        return -1;
+
+    while (_port->available() > 0) {
+        char incomingChar = _port->read();
+        if (incomingChar == '\n') {
+            Serial.println();
+            Serial.println(F("--------------"));
+            _message[_messageIndex] = '\0'; // Null-terminate the string
+            Serial.print("Message: ");
+            Serial.println(_message);
+            Serial.println(F("--------------"));
+            Serial.println();
+            _messageIndex = 0;
+            continue;
+        } 
+        
+        if (_messageIndex < COMMUNICATION_MAX_MESSAGE_LENGTH - 1)
+        _message[_messageIndex++] = incomingChar;
+    }
+
+    return _messageIndex;
+}
+
+void CommunicationRadioLoRa::writeBytes(uint8_t* byteArray, size_t length) {
+    if (_port == nullptr) {
+        Serial.println("Error: no port setup for the LoRa radio.");
+        return;
+    }
+
+#ifdef DEBUG_COMMUNICATION_RADIO_LORA
+    Serial.print(F("CommunicationRadioLoRaEbyte::writeBytes: buffer length: "));
+    Serial.println(length);
+    Serial.println(F("CommunicationRadioLoRaEbyte::writeBytes: message bytes to send: "));
+    for (size_t i = 0; i < length; i++)
+        Serial.printf(F("%d "), byteArray[i]);
+    Serial.println();
+#endif
+
+    _port->write(byteArray, length);
+}
+
+void CommunicationRadioLoRa::writeChars(const char* chars) {
+    if (_port == nullptr) {
+        Serial.println("Error: no port setup for the LoRa radio.");
+        return;
+    }
+    _port->write(chars);
+}
