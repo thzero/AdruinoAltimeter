@@ -20,6 +20,10 @@ uint8_t CommunicationMAVLink::getState() {
     return _state;
 }
 
+void CommunicationMAVLink::init(CommunicationMAVLinkHandlerCommandShortFunctionPtr func) {
+    _handlerCommandShort = func;
+}
+
 int CommunicationMAVLink::process(unsigned long timestamp, unsigned long delta) {
   return 1;
 }
@@ -32,6 +36,8 @@ void CommunicationMAVLink::read(CommunicationMAVLinkHandlerFunctionPtr func, uns
 
     if (_radio->available() == 0)
         return;
+    Serial.print(F("CommunicationMAVLink::read "));
+    Serial.println(_radio->available());
 
     if (_bufferIndex > MAVLINK_MAX_PACKET_LEN) {
         Serial.print(F("Failed, buffer exceeded length of "));
@@ -54,6 +60,8 @@ void CommunicationMAVLink::read(CommunicationMAVLinkHandlerFunctionPtr func, uns
         
         int readVal = _radio->read(); // Read the incoming byte
         _bufferSerialInbound[_bufferIndex++] = readVal;
+            Serial.print(F("mavlink!!!! "));
+            Serial.println(readVal);
         
         if (mavlink_parse_char(MAVLINK_COMM_0, readVal, &message, &status)) {
             Serial.print(F("mavlink!!!! "));
@@ -64,8 +72,14 @@ void CommunicationMAVLink::read(CommunicationMAVLinkHandlerFunctionPtr func, uns
             memset(_bufferSerialInbound, 0, MAVLINK_MAX_PACKET_LEN);
             _bufferIndex = 0;
 
+            Serial.print(F("mavlink!!!! "));
+            Serial.println(message.msgid);
+
             if (message.msgid == MAVLINK_MSG_ID_HEARTBEAT)
                 _handleHeartbeat(&message);
+
+            if (message.msgid == MAVLINK_MSG_ID_COMMAND_SHORT)
+                _handleCommandShort(&message);
 
             if (func != nullptr)
                 func(timestamp, delta, &message);
@@ -200,6 +214,30 @@ void CommunicationMAVLink::sendSensorsBarometerAltitude(uint64_t time_usec, sens
     );
     
     _write(&message);
+}
+
+void CommunicationMAVLink::_handleCommandShort(const mavlink_message_t* message) {
+    mavlink_command_short_t msgshort;
+    mavlink_msg_command_short_decode(message, &msgshort);
+
+    Serial.println(F("communication-mavlink-command-short-received..."));
+    Serial.print(F("communication-mavlink-command-short-received..._handlerCommandShort: "));
+    Serial.println((_handlerCommandShort != nullptr));
+
+        Serial.print(F("mavlink!!!! command "));
+        Serial.println(msgshort.command);
+        Serial.println(msgshort.param1);
+        Serial.println(msgshort.param2);
+        Serial.println(msgshort.param3);
+
+    mavlink_message_t message_ack;
+    mavlink_msg_command_ack_pack(COMMUNICATION_MAVLINK_SYSTEM_ID_MCU, COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message_ack, 
+        msgshort.command, 1, 1, 0, msgshort.target_system, msgshort.target_component);
+
+    _write(&message_ack);
+  
+    if (_handlerCommandShort != nullptr)
+        _handlerCommandShort(&msgshort);
 }
 
 void CommunicationMAVLink::_handleHeartbeat(const mavlink_message_t* message) {

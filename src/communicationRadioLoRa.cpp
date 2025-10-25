@@ -35,7 +35,12 @@ int CommunicationRadioLoRa::read() {
         Serial.println("Error: no port setup for the LoRa radio.");
         return 0;
     }
-    return _port->read();
+
+    int value = _port->read();
+    Serial.print("read: ");
+    Serial.println(value);
+    return value;
+    // return _port->read();
 }
 
 size_t CommunicationRadioLoRa::read(CommunicationHandlerFunctionPtr func, unsigned long timestamp, unsigned long delta) {
@@ -47,8 +52,12 @@ size_t CommunicationRadioLoRa::read(CommunicationHandlerFunctionPtr func, unsign
     if (_port->available() <= 0)
         return -1;
 
+    Serial.println("CommunicationRadioLoRa::read.....");
+    Serial.println(_port->available());
     while (_port->available() > 0) {
         char incomingChar = _port->read();
+            Serial.print("Message: ");
+            Serial.println(_message);
         if (incomingChar == '\n') {
             Serial.println();
             Serial.println(F("--------------"));
