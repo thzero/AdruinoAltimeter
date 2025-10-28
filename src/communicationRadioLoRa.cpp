@@ -2,16 +2,20 @@
 
 #include "communicationRadioLoRa.h"
 
-byte CommunicationRadioLoRa::setup(HardwareSerial* port, int address, int networkId, int baud) {
+byte CommunicationRadioLoRa::setup(HardwareSerial* port, int address, int channel, int networkId, int baud) {
     if (port == nullptr)
         return 1;
 
     _port = port;
     _baud = baud;
-    if (_baud == -1)
+    if (_baud < 0)
         _baud = 9600;
-    _address = address;
-    _networkId = networkId;
+    if (address >= 0)
+        _address = address;
+    if (channel >= 0)
+        _channel = channel;
+    if (networkId >= 0)
+        _networkId = networkId;
 
     Serial.println(F("\tSetup communication radio LoRa Serial..."));
     _port->setTimeout(10);
@@ -77,6 +81,22 @@ size_t CommunicationRadioLoRa::read(CommunicationHandlerFunctionPtr func, unsign
     return _messageIndex;
 }
 
+byte CommunicationRadioLoRa::reset() {
+    return 0;
+}
+
+void CommunicationRadioLoRa::setAddress(uint16_t address) {
+    _address = address;
+}
+
+void CommunicationRadioLoRa::setChannel(uint8_t channel) {
+    _channel = channel;
+}
+
+void CommunicationRadioLoRa::setNetworkId(uint8_t networkId) {
+    _networkId = networkId;
+}
+
 void CommunicationRadioLoRa::writeBytes(uint8_t* byteArray, size_t length) {
     if (_port == nullptr) {
         Serial.println("Error: no port setup for the LoRa radio.");
@@ -84,9 +104,9 @@ void CommunicationRadioLoRa::writeBytes(uint8_t* byteArray, size_t length) {
     }
 
 #ifdef DEBUG_COMMUNICATION_RADIO_LORA
-    Serial.print(F("CommunicationRadioLoRaEbyte::writeBytes: buffer length: "));
+    Serial.print(F("CommunicationRadioLoRa::writeBytes: buffer length: "));
     Serial.println(length);
-    Serial.println(F("CommunicationRadioLoRaEbyte::writeBytes: message bytes to send: "));
+    Serial.println(F("CommunicationRadioLoRa::writeBytes: message bytes to send: "));
     for (size_t i = 0; i < length; i++)
         Serial.printf(F("%d "), byteArray[i]);
     Serial.println();

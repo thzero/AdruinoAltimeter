@@ -19,7 +19,7 @@
 #define COMMUNICATION_MAVLINK_MODE_NONE 0
 #define COMMUNICATION_MAVLINK_MODE_ARMED 1
 
-#define COMMUNICATION_MAVLINK_SYSTEM_ID_MCU 1
+#define COMMUNICATION_MAVLINK_SYSTEM_ID_MCU 255
 #define COMMUNICATION_MAVLINK_COMPONENT_ID_NONE 0
 
 typedef void (*CommunicationMAVLinkHandlerFunctionPtr)(unsigned long timestamp, unsigned long deltaElapsed, const mavlink_message_t* message);
@@ -31,8 +31,9 @@ class CommunicationMAVLink {
     }
 
     byte setup(CommunicationRadio* radio);
-    uint8_t getState();
     uint8_t getMode();
+    uint8_t getState();
+    uint8_t getSystemId();
     void init(CommunicationMAVLinkHandlerCommandShortFunctionPtr func);
     int process(unsigned long timestamp, unsigned long delta);
     void read(CommunicationMAVLinkHandlerFunctionPtr func, unsigned long timestamp, unsigned long delta);
@@ -44,6 +45,7 @@ class CommunicationMAVLink {
     void sendIMU(uint64_t time_usec, int16_t xacc, int16_t yacc, int16_t zacc, int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag);
     void sendSensors(uint64_t time_usec, sensorValuesStruct sensorData);
     void sendSensorsBarometerAltitude(uint64_t time_usec, sensorValuesStruct sensorData);
+    void setNetworkId(uint8_t id);
 
   protected:
     void _handleCommandShort(const mavlink_message_t* message);
@@ -55,6 +57,7 @@ class CommunicationMAVLink {
     int _bufferIndex = 0;
     uint8_t _bufferSerialInbound[MAVLINK_MAX_PACKET_LEN];
 
+    uint8_t _networkId = COMMUNICATION_MAVLINK_SYSTEM_ID_MCU;
     uint8_t _mode;
     uint8_t _state;
 };

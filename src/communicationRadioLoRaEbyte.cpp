@@ -1,7 +1,11 @@
 #include "CommunicationRadioLoRaEbyte.h"
 
-byte CommunicationRadioLoRaEbyte::setup(HardwareSerial* port, uint8_t pin_m0, uint8_t pin_m1, uint8_t pin_aux, int address, int networkId, int baud) {
-    byte results = CommunicationRadioLoRa::setup(port, address, networkId, baud);
+byte CommunicationRadioLoRaEbyte::reset() {
+    // TODO: set address, channel, networkId...
+}
+
+byte CommunicationRadioLoRaEbyte::setup(HardwareSerial* port, uint8_t pin_m0, uint8_t pin_m1, uint8_t pin_aux, int address, int channel, int networkId, int baud) {
+    byte results = CommunicationRadioLoRa::setup(port, address, channel, networkId, baud);
     if (results > 0)
         return results;
 
@@ -9,6 +13,15 @@ byte CommunicationRadioLoRaEbyte::setup(HardwareSerial* port, uint8_t pin_m0, ui
 
     if (_port == nullptr)
          return 1;
+         
+    if (address >= 0)
+        _address = address;
+    if (channel >= 0)
+        _channel = channel;
+    if (_channel > 45)
+        _channel = 45;
+    if (networkId >= 0)
+        _networkId = networkId;
 
     _port->end();
     _port->begin(9600);
@@ -31,6 +44,9 @@ byte CommunicationRadioLoRaEbyte::setup(HardwareSerial* port, uint8_t pin_m0, ui
     else if (baudRate == 7)
         _baud = 115200;
     Serial.printf(F("CommunicationRadioLoRa::setup._baud: %d\n"), _baud);
+
+    // TODO: set address, channel, networkId...
+    // Channel is used to manipulate the frequency
 
     _port->end();
     _port->begin(_baud);

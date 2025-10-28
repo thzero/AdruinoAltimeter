@@ -20,6 +20,10 @@ uint8_t CommunicationMAVLink::getState() {
     return _state;
 }
 
+uint8_t CommunicationMAVLink::getSystemId() {
+    return _networkId;
+}
+
 void CommunicationMAVLink::init(CommunicationMAVLinkHandlerCommandShortFunctionPtr func) {
     _handlerCommandShort = func;
 }
@@ -102,7 +106,7 @@ void CommunicationMAVLink::sendHeartbeat(uint8_t type, uint8_t state, uint8_t mo
 #endif
 
     mavlink_message_t message;
-    mavlink_msg_heartbeat_pack(COMMUNICATION_MAVLINK_SYSTEM_ID_MCU, COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, 
+    mavlink_msg_heartbeat_pack(getSystemId(), COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, 
         type, MAV_AUTOPILOT_INVALID, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, mode, state);
 
     _write(&message);
@@ -137,7 +141,7 @@ void CommunicationMAVLink::sendGPSFiltered(uint64_t time_usec, int32_t lat, int3
 #endif
 
     mavlink_message_t message;
-    mavlink_msg_global_position_int_pack(COMMUNICATION_MAVLINK_SYSTEM_ID_MCU, COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, lat, lon, alt, alt_ellipsoid, 0, 0, 0, 0);
+    mavlink_msg_global_position_int_pack(getSystemId(), COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, lat, lon, alt, alt_ellipsoid, 0, 0, 0, 0);
 
     _write(&message);
 }
@@ -153,8 +157,8 @@ void CommunicationMAVLink::sendGPSRaw(uint64_t time_usec, int32_t lat, int32_t l
 #endif
 
     mavlink_message_t message;
-    mavlink_msg_gps_raw_int_pack(COMMUNICATION_MAVLINK_SYSTEM_ID_MCU, COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, fix_type, lat, lon, alt, eph, epv, UINT16_MAX, cog, satellites_visible, alt_ellipsoid, 0, 0, 0, 0, 0);
-    // mavlink_msg_test_pack(COMMUNICATION_MAVLINK_SYSTEM_ID_MCU, COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, fix_type, lat, lon, alt, eph, epv, UINT16_MAX, cog, satellites_visible, alt_ellipsoid, 0, 0, 0, 0, 0);
+    mavlink_msg_gps_raw_int_pack(getSystemId(), COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, fix_type, lat, lon, alt, eph, epv, UINT16_MAX, cog, satellites_visible, alt_ellipsoid, 0, 0, 0, 0, 0);
+    // mavlink_msg_test_pack(getSystemId(), COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, fix_type, lat, lon, alt, eph, epv, UINT16_MAX, cog, satellites_visible, alt_ellipsoid, 0, 0, 0, 0, 0);
 
     _write(&message);
 }
@@ -170,7 +174,7 @@ void CommunicationMAVLink::sendIMU(uint64_t time_usec, int16_t xacc, int16_t yac
 #endif
 
     mavlink_message_t message;
-    mavlink_msg_raw_imu_pack(COMMUNICATION_MAVLINK_SYSTEM_ID_MCU, COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, xacc, yacc, zacc, xgyro, ygyro, zgyro, xmag, ymag, zmag, 0, 0);
+    mavlink_msg_raw_imu_pack(getSystemId(), COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, xacc, yacc, zacc, xgyro, ygyro, zgyro, xmag, ymag, zmag, 0, 0);
     
     _write(&message);
 }
@@ -186,7 +190,7 @@ void CommunicationMAVLink::sendSensors(uint64_t time_usec, sensorValuesStruct se
 #endif
 
     mavlink_message_t message;
-    mavlink_msg_combined_sensors_pack(COMMUNICATION_MAVLINK_SYSTEM_ID_MCU, COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, 
+    mavlink_msg_combined_sensors_pack(getSystemId(), COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, 
         convertAcc(sensorData.acceleration.x), convertAcc(sensorData.acceleration.y), convertAcc(sensorData.acceleration.z), 
         convertGyro(sensorData.gyroscope.x), convertGyro(sensorData.gyroscope.y), convertGyro(sensorData.gyroscope.z), 
         convertMagnetometer(sensorData.magnetometer.x), convertMagnetometer(sensorData.magnetometer.y), convertMagnetometer(sensorData.magnetometer.z), 
@@ -208,12 +212,16 @@ void CommunicationMAVLink::sendSensorsBarometerAltitude(uint64_t time_usec, sens
 #endif
 
     mavlink_message_t message;
-    mavlink_msg_barometer_altitude_pack(COMMUNICATION_MAVLINK_SYSTEM_ID_MCU, COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, 
+    mavlink_msg_barometer_altitude_pack(getSystemId(), COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, 
         convertAtmosphere(sensorData.atmosphere.humidity), convertAtmosphere(sensorData.atmosphere.pressure), convertAtmosphere(sensorData.atmosphere.temperature),
         convertAltitude(sensorData.atmosphere.altitude)
     );
     
     _write(&message);
+}
+
+void CommunicationMAVLink::setNetworkId(uint8_t id) {
+    _networkId = id;
 }
 
 void CommunicationMAVLink::_handleCommandShort(const mavlink_message_t* message) {
@@ -231,7 +239,7 @@ void CommunicationMAVLink::_handleCommandShort(const mavlink_message_t* message)
         Serial.println(msgshort.param3);
 
     mavlink_message_t message_ack;
-    mavlink_msg_command_ack_pack(COMMUNICATION_MAVLINK_SYSTEM_ID_MCU, COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message_ack, 
+    mavlink_msg_command_ack_pack(getSystemId(), COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message_ack, 
         msgshort.command, 1, 1, 0, msgshort.target_system, msgshort.target_component);
 
     _write(&message_ack);
