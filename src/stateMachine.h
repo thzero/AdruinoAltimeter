@@ -47,21 +47,21 @@ struct stateMachineSettingsSampleRatesStruct {
     int landed = SAMPLE_RATE_LANDED;
 };
 
-struct stateMachineSettingsStruct {
-    int altitudeLiftoff = ALTITUDE_LIFTOFF;
-    settingsSampleMeasuresStruct sampleMeasures;
-    settingsSampleRatesStruct sampleRates;
-    // Assumed environmental values
-    float altitudeBarometer = 1650.3;  // meters ... map readings + barometer position
-    int timeoutRecording = 300 * 10000;
-    int timeOutTimeToApogee = 20000;
-};
+// struct stateMachineSettingsStruct {
+//     int altitudeLiftoff = ALTITUDE_LIFTOFF;
+//     settingsSampleMeasuresStruct sampleMeasures;
+//     settingsSampleRatesStruct sampleRates;
+//     // Assumed environmental values
+//     float altitudeBarometer = 1650.3;  // meters ... map readings + barometer position
+//     int timeoutRecording = 300 * 10000;
+//     int timeOutTimeToApogee = 20000;
+// };
 
 typedef void (*StateMachineStateFunctionPtr)(flightStates state, unsigned long timestamp, unsigned long deltaElapsed);
 typedef void (*StateMachineStateChangedFunctionPtr)(flightStates state, flightStates stateFrom, unsigned long timestamp, unsigned long deltaElapsed);
 typedef void (*StateMachineStateThottledFunctionPtr)(flightStates state, unsigned long timestamp, unsigned long deltaElapsed);
-typedef void (*StateMachinePreferenceLoadFunctionPtr)(stateMachineSettingsStruct& settings);
-typedef void (*StateMachinePreferenceSaveFunctionPtr)(stateMachineSettingsStruct& settings);
+typedef void (*StateMachinePreferenceLoadFunctionPtr)(settingStateMachineStruct& settings);
+typedef void (*StateMachinePreferenceSaveFunctionPtr)(settingStateMachineStruct& settings);
 
 class stateMachine {
   public:
@@ -121,7 +121,7 @@ class stateMachine {
     int _sampleRateAirborneDescent;
     int _sampleRateGround;
     sensors* _sensors;
-    stateMachineSettingsStruct _stateMachineSettings;
+    settingStateMachineStruct _stateMachineSettings;
 };
 
 extern stateMachine _stateMachine;
