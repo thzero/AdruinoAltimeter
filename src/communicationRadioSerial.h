@@ -9,13 +9,7 @@
 #include <communicationRadio.h>
 
 // #define DEBUG
-// #define DEBUG_COMMUNICATION
-// #define DEBUG_COMMUNICATION_COMMAND
-// #define DEBUG_COMMUNICATION_INTERNAL
-// #define DEBUG_COMMUNICATION_PROCESS
-// #define DEBUG_COMMUNICATION_QUEUE
-// #define DEBUG_COMMUNICATION_READ
-// #define DEBUG_COMMUNICATION_SEND
+// #define DEBUG_COMMUNICATION_RADIO_SERIAL_SEND
 
 class CommunicationRadioSerial: public CommunicationRadio {
   public:

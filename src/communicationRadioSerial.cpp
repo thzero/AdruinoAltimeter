@@ -22,6 +22,7 @@ int CommunicationRadioSerial::available() {
         Serial.println("Error: no port setup for the serial radio.");
         return false;
     }
+    
     return _port->available();
 }
 
@@ -30,6 +31,7 @@ int CommunicationRadioSerial::read() {
         Serial.println("Error: no port setup for the serial radio.");
         return 0;
     }
+
     return _port->read();
 }
 
@@ -39,12 +41,14 @@ void CommunicationRadioSerial::writeBytes(uint8_t* byteArray, size_t length) {
         return;
     }
 
+#ifdef DEBUG_COMMUNICATION_RADIO_SERIAL_SEND
     Serial.print(F("CommunicationRadioSerial::writeBytes: buffer length: "));
     Serial.println(length);
     Serial.println(F("CommunicationRadioSerial::writeBytes: message bytes to send: "));
     for (size_t i = 0; i < length; i++)
         Serial.printf(F("%d "), byteArray[i]);
     Serial.println();
+#endif
 
     _port->write(byteArray, length);
 }

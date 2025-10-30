@@ -24,6 +24,7 @@ struct __attribute__((packed)) communicationInternalStruct {
   communicationMonitorDataStruct monitor;
   settingsStruct settings;
   flightDataVelocityValues velocity;
+  uint8_t securityCode[6];
 };
 
 #endif

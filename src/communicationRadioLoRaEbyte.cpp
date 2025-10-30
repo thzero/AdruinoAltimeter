@@ -1,7 +1,11 @@
 #include "CommunicationRadioLoRaEbyte.h"
 
-byte CommunicationRadioLoRaEbyte::setup(HardwareSerial* port, uint8_t pin_m0, uint8_t pin_m1, uint8_t pin_aux, int address, int networkId, int baud) {
-    byte results = CommunicationRadioLoRa::setup(port, address, networkId, baud);
+byte CommunicationRadioLoRaEbyte::reset() {
+    // TODO: set address, channel, networkId...
+}
+
+byte CommunicationRadioLoRaEbyte::setup(HardwareSerial* port, uint8_t pin_m0, uint8_t pin_m1, uint8_t pin_aux, int address, int channel, int networkId, int baud) {
+    byte results = CommunicationRadioLoRa::setup(port, address, channel, networkId, baud);
     if (results > 0)
         return results;
 
@@ -9,6 +13,15 @@ byte CommunicationRadioLoRaEbyte::setup(HardwareSerial* port, uint8_t pin_m0, ui
 
     if (_port == nullptr)
          return 1;
+         
+    if (address >= 0)
+        _address = address;
+    if (channel >= 0)
+        _channel = channel;
+    if (_channel > 45)
+        _channel = 45;
+    if (networkId >= 0)
+        _networkId = networkId;
 
     _port->end();
     _port->begin(9600);
@@ -32,6 +45,9 @@ byte CommunicationRadioLoRaEbyte::setup(HardwareSerial* port, uint8_t pin_m0, ui
         _baud = 115200;
     Serial.printf(F("CommunicationRadioLoRa::setup._baud: %d\n"), _baud);
 
+    // TODO: set address, channel, networkId...
+    // Channel is used to manipulate the frequency
+
     _port->end();
     _port->begin(_baud);
 
@@ -44,44 +60,4 @@ byte CommunicationRadioLoRaEbyte::setup(HardwareSerial* port, uint8_t pin_m0, ui
     Serial.println(F("\t...setup communication radio LORA transceiver finished."));
 
     return 0;
-}
-
-int CommunicationRadioLoRaEbyte::available() {
-    if (_port == nullptr) {
-        Serial.println("Error: no port setup for the LoRa radio.");
-        return false;
-    }
-    return _port->available();
-}
-
-int CommunicationRadioLoRaEbyte::read() {
-    if (_port == nullptr) {
-        Serial.println("Error: no port setup for the LoRa radio.");
-        return 0;
-    }
-    return _port->read();
-}
-
-void CommunicationRadioLoRaEbyte::writeBytes(uint8_t* byteArray, size_t length) {
-    if (_port == nullptr) {
-        Serial.println("Error: no port setup for the LoRa radio.");
-        return;
-    }
-
-    Serial.print(F("CommunicationRadioLoRaEbyte::writeBytes: buffer length: "));
-    Serial.println(length);
-    Serial.println(F("CommunicationRadioLoRaEbyte::writeBytes: message bytes to send: "));
-    for (size_t i = 0; i < length; i++)
-        Serial.printf(F("%d "), byteArray[i]);
-    Serial.println();
-
-    _port->write(byteArray, length);
-}
-
-void CommunicationRadioLoRaEbyte::writeChars(const char* chars) {
-    if (_port == nullptr) {
-        Serial.println("Error: no port setup for the LoRa radio.");
-        return;
-    }
-    _port->write(chars);
 }
