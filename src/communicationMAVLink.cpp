@@ -1,7 +1,6 @@
 #include <Arduino.h>
 
 #include "communicationMAVLink.h"
-#include <sensorUtilities.h>
 
 byte CommunicationMAVLink::setup(CommunicationRadio* radio) {
     if (radio == nullptr)
@@ -24,8 +23,8 @@ uint8_t CommunicationMAVLink::getSystemId() {
     return _networkId;
 }
 
-void CommunicationMAVLink::init(CommunicationMAVLinkHandlerCommandShortFunctionPtr func) {
-    _handlerCommandShort = func;
+void CommunicationMAVLink::init(CommunicationMAVLinkHandlerCommandIntFunctionPtr func) {
+    _handlerCommandInt = func;
 }
 
 int CommunicationMAVLink::process(unsigned long timestamp, unsigned long delta) {
@@ -82,8 +81,12 @@ void CommunicationMAVLink::read(CommunicationMAVLinkHandlerFunctionPtr func, uns
             if (message.msgid == MAVLINK_MSG_ID_HEARTBEAT)
                 _handleHeartbeat(&message);
 
-            if (message.msgid == MAVLINK_MSG_ID_COMMAND_SHORT)
-                _handleCommandShort(&message);
+            if (message.msgid == MAVLINK_MSG_ID_COMMAND_INT)
+                _handleCommandInt(&message);
+
+            bool handled = _handleMessage(&message);
+            if (handled)
+                return;
 
             if (func != nullptr)
                 func(timestamp, delta, &message);
@@ -130,122 +133,33 @@ void CommunicationMAVLink::sendHeartbeatStandby() {
     sendHeartbeat(MAV_TYPE_ROCKET, MAV_STATE_STANDBY, 0);
 }
 
-void CommunicationMAVLink::sendGPSFiltered(uint64_t time_usec, int32_t lat, int32_t lon, int32_t alt, int32_t alt_ellipsoid) {
-    if (_radio == nullptr) {
-        Serial.println("Error: no radio.");
-        return;
-    }
-
-#ifdef DEBUG_COMMUNICATION_MAVLINK
-    Serial.println(F("communication-mavlink-gpsf..."));
-#endif
-
-    mavlink_message_t message;
-    mavlink_msg_global_position_int_pack(getSystemId(), COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, lat, lon, alt, alt_ellipsoid, 0, 0, 0, 0);
-
-    _write(&message);
-}
-
-void CommunicationMAVLink::sendGPSRaw(uint64_t time_usec, int32_t lat, int32_t lon, int32_t alt, int32_t alt_ellipsoid, uint16_t eph, uint16_t epv, uint16_t vel, uint16_t cog, uint8_t satellites_visible, uint8_t fix_type) {
-    if (_radio == nullptr) {
-        Serial.println("Error: no radio.");
-        return;
-    }
-
-#ifdef DEBUG_COMMUNICATION_MAVLINK
-    Serial.println(F("communication-mavlink-gpsr..."));
-#endif
-
-    mavlink_message_t message;
-    mavlink_msg_gps_raw_int_pack(getSystemId(), COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, fix_type, lat, lon, alt, eph, epv, UINT16_MAX, cog, satellites_visible, alt_ellipsoid, 0, 0, 0, 0, 0);
-    // mavlink_msg_test_pack(getSystemId(), COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, fix_type, lat, lon, alt, eph, epv, UINT16_MAX, cog, satellites_visible, alt_ellipsoid, 0, 0, 0, 0, 0);
-
-    _write(&message);
-}
-
-void CommunicationMAVLink::sendIMU(uint64_t time_usec, int16_t xacc, int16_t yacc, int16_t zacc, int16_t xgyro, int16_t ygyro, int16_t zgyro, int16_t xmag, int16_t ymag, int16_t zmag) {
-    if (_radio == nullptr) {
-        Serial.println("Error: no radio.");
-        return;
-    }
-
-#ifdef DEBUG_COMMUNICATION_MAVLINK
-    Serial.println(F("communication-mavlink-imu..."));
-#endif
-
-    mavlink_message_t message;
-    mavlink_msg_raw_imu_pack(getSystemId(), COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, xacc, yacc, zacc, xgyro, ygyro, zgyro, xmag, ymag, zmag, 0, 0);
-    
-    _write(&message);
-}
-
-void CommunicationMAVLink::sendSensors(uint64_t time_usec, sensorValuesStruct sensorData) {
-    if (_radio == nullptr) {
-        Serial.println("Error: no radio.");
-        return;
-    }
-
-#ifdef DEBUG_COMMUNICATION_MAVLINK
-    Serial.println(F("communication-mavlink-sensor..."));
-#endif
-
-    mavlink_message_t message;
-    mavlink_msg_combined_sensors_pack(getSystemId(), COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, 
-        convertAcc(sensorData.acceleration.x), convertAcc(sensorData.acceleration.y), convertAcc(sensorData.acceleration.z), 
-        convertGyro(sensorData.gyroscope.x), convertGyro(sensorData.gyroscope.y), convertGyro(sensorData.gyroscope.z), 
-        convertMagnetometer(sensorData.magnetometer.x), convertMagnetometer(sensorData.magnetometer.y), convertMagnetometer(sensorData.magnetometer.z), 
-        convertAtmosphere(sensorData.atmosphere.humidity), convertAtmosphere(sensorData.atmosphere.pressure), convertAtmosphere(sensorData.atmosphere.temperature), 
-        convertAltitude(sensorData.atmosphere.altitude), 
-        0, 0, 0);
-    
-    _write(&message);
-}
-
-void CommunicationMAVLink::sendSensorsBarometerAltitude(uint64_t time_usec, sensorValuesStruct sensorData) {
-    if (_radio == nullptr) {
-        Serial.println("Error: no radio.");
-        return;
-    }
-
-#ifdef DEBUG_COMMUNICATION_MAVLINK
-    Serial.println(F("communication-mavlink-sensor-barometer..."));
-#endif
-
-    mavlink_message_t message;
-    mavlink_msg_barometer_altitude_pack(getSystemId(), COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message, time_usec, 
-        convertAtmosphere(sensorData.atmosphere.humidity), convertAtmosphere(sensorData.atmosphere.pressure), convertAtmosphere(sensorData.atmosphere.temperature),
-        convertAltitude(sensorData.atmosphere.altitude)
-    );
-    
-    _write(&message);
-}
-
 void CommunicationMAVLink::setNetworkId(uint8_t id) {
     _networkId = id;
 }
 
-void CommunicationMAVLink::_handleCommandShort(const mavlink_message_t* message) {
-    mavlink_command_short_t msgshort;
-    mavlink_msg_command_short_decode(message, &msgshort);
+bool CommunicationMAVLink::_handleMessage(const mavlink_message_t* message) {
+    return false;
+}
 
-    Serial.println(F("communication-mavlink-command-short-received..."));
-    Serial.print(F("communication-mavlink-command-short-received..._handlerCommandShort: "));
-    Serial.println((_handlerCommandShort != nullptr));
+void CommunicationMAVLink::_handleCommandInt(const mavlink_message_t* message) {
+    mavlink_command_int_t msgInt;
+    mavlink_msg_command_int_decode(message, &msgInt);
 
-        Serial.print(F("mavlink!!!! command "));
-        Serial.println(msgshort.command);
-        Serial.println(msgshort.param1);
-        Serial.println(msgshort.param2);
-        Serial.println(msgshort.param3);
+    Serial.println(F("communication-mavlink-command-int-received..."));
+    Serial.print(F("communication-mavlink-command-int-received..._handlerCommandInt: "));
+    Serial.println((_handlerCommandInt != nullptr));
+
+    Serial.print(F("mavlink!!!! command "));
+    Serial.println(msgInt.command);
 
     mavlink_message_t message_ack;
     mavlink_msg_command_ack_pack(getSystemId(), COMMUNICATION_MAVLINK_COMPONENT_ID_NONE, &message_ack, 
-        msgshort.command, 1, 1, 0, msgshort.target_system, msgshort.target_component);
+        msgInt.command, 1, 1, 0, msgInt.target_system, msgInt.target_component);
 
     _write(&message_ack);
   
-    if (_handlerCommandShort != nullptr)
-        _handlerCommandShort(&msgshort);
+    if (_handlerCommandInt != nullptr)
+        _handlerCommandInt(&msgInt);
 }
 
 void CommunicationMAVLink::_handleHeartbeat(const mavlink_message_t* message) {
