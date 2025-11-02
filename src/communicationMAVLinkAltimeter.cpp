@@ -106,8 +106,12 @@ bool CommunicationMAVLinkAltimeter::_handleMessage(const mavlink_message_t* mess
     if (message == nullptr)
         return false;
 
-    if (message->msgid == MAVLINK_MSG_ID_COMMAND_INT)
+    if (message->msgid == MAVLINK_MSG_ID_COMMAND_INT) {
         _handleCommandShort(message);
+        return true;
+    }
+
+    return false;
 }
 
 void CommunicationMAVLinkAltimeter::_handleCommandShort(const mavlink_message_t* message) {
