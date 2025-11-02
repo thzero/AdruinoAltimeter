@@ -1,5 +1,3 @@
-#include <Arduino.h>
-
 #include "communicationMAVLinkAltimeter.h"
 #include <sensorUtilities.h>
 

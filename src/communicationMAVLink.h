@@ -1,10 +1,6 @@
 #ifndef _COMMUNICATION_MAVLINK_H
 #define _COMMUNICATION_MAVLINK_H
 
-#include <stdint.h>
-#include <Arduino.h>
-#include <limits.h>
-
 // #define DEBUG
 
 #include <communicationData.h>

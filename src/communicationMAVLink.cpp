@@ -1,5 +1,3 @@
-#include <Arduino.h>
-
 #include "communicationMAVLink.h"
 
 byte CommunicationMAVLink::setup(CommunicationRadio* radio) {

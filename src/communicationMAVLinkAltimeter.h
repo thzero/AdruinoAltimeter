@@ -1,9 +1,6 @@
 #ifndef _COMMUNICATION_MAVLINK_ALTIMETER_H
 #define _COMMUNICATION_MAVLINK_ALTIMETER_H
 
-#include <stdint.h>
-#include <Arduino.h>
-
 // #define DEBUG
 
 #include <communicationMavlink.h>
