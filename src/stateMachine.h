@@ -1,8 +1,6 @@
 #ifndef _STATE_MACHINE_H
 #define _STATE_MACHINE_H
 
-#include <ArduinoJson.h>
-
 #include <buttonHandlerBase.h>
 #include <flightData.h>
 #include <flightLog.h>
