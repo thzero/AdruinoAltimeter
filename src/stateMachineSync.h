@@ -43,6 +43,6 @@ class stateMachineSync {
     int _sampleRateGround;
 };
 
-extern stateMachineSync _stateMachine;
+extern stateMachineSync _stateMachineSync;
 
 #endif
