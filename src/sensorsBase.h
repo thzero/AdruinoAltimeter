@@ -21,6 +21,7 @@ class sensorsBase {
   public:
     virtual void calibrationResetCommand(uint8_t* commandBuffer, uint16_t commandBufferLength);
     sensorValuesStruct initialize();
+    int8_t initOverride(SensorOverrideFunctionPtr funcOverride);
     virtual void integrateVelocity(sensorValuesStruct* data, unsigned long current, unsigned long delta);
     virtual float readAltitude();
     virtual float readAltitude(atmosphereValues values);
