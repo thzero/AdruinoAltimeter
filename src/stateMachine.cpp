@@ -8,9 +8,9 @@
 // #include <neoPixel.h>
 // #include <network.h>
 // #include <sensor.h>
-// #ifdef DEV_SIM
-// #include "simulation.h"
-// #endif
+#if defined(DEV) && defined(DEV_SIM)
+#include "simulation.h"
+#endif
 #include "settings.h"
 #include "stateMachine.h"
 // #include <time.h>
@@ -110,10 +110,10 @@ void stateMachine::loopStateAIRBORNEToABORTED(unsigned long timestamp, unsigned 
   // _flightLogger.recording = false;
   // _flightLogger.touchdown = false;
 
-// #ifdef DEV_SIM
-//   if (_simulation.isRunning()) 
-//     _simulation.stop();
-// #endif
+#if defined(DEV) && defined(DEV_SIM)
+  if (_simulation.isRunning()) 
+    _simulation.stop();
+#endif
 
   debug(F(""));
   debug(F(""));
@@ -387,10 +387,10 @@ void stateMachine::loopStateLANDED(unsigned long timestamp, unsigned long deltaE
 }
 
 void stateMachine::loopStateLANDEDToGROUND(unsigned long timestamp, unsigned long deltaElapsed) {
-// #ifdef DEV_SIM
-//   if (_simulation.isRunning()) 
-//     _simulation.stop();
-// #endif
+#if defined(DEV) && defined(DEV_SIM)
+  if (_simulation.isRunning()) 
+    _simulation.stop();
+#endif
 
   debug(F(""));
   debug(F(""));

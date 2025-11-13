@@ -11,6 +11,11 @@ sensorValuesStruct sensorsBase::initialize() {
   return data;
 }
 
+int8_t sensorsBase::initOverride(SensorOverrideFunctionPtr atmosphereFuncOverride, SensorOverrideFunctionPtr imuFuncOverride) {
+  _atmosphereSensor->initOverride(atmosphereFuncOverride);
+  _imuSensor->initOverride(imuFuncOverride);
+}
+
 void sensorsBase::integrateVelocity(sensorValuesStruct* data, unsigned long current, unsigned long delta) {
   if (data == nullptr)
     return;
