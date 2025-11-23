@@ -4,17 +4,17 @@
 #include "stateMachineConstants.h"
 
 struct __attribute__((packed)) settingsSampleMeasuresStruct {
-    int aborted;
-    int apogee;
-    int landed;
+    unsigned aborted;
+    unsigned apogee;
+    unsigned landed;
 };
 
 struct __attribute__((packed)) settingsSampleRatesStruct {
-    int airborneAscent;
-    int airborneDescent;
-    int aborted;
-    int ground;
-    int landed;
+    unsigned long airborneAscent;
+    unsigned long airborneDescent;
+    unsigned long aborted;
+    unsigned long ground;
+    unsigned long landed;
 };
 
 struct __attribute__((packed)) settingStateMachineStruct {
@@ -23,8 +23,8 @@ struct __attribute__((packed)) settingStateMachineStruct {
     settingsSampleRatesStruct sampleRates;
     // Assumed environmental values
     float altitudeBarometer = 1650.3;  // meters ... map readings + barometer position
-    int timeoutRecording = 300 * 10000;
-    int timeOutTimeToApogee = 20000;
+    unsigned long timeoutRecording = 600 * 1000 * 1000; // in microseconds
+    unsigned long timeOutTimeToApogee = 200 * 1000 * 1000; // in microseconds
 };
 
 struct __attribute__((packed)) settingsCommunicationLoRaStruct {
