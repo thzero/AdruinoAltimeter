@@ -37,6 +37,9 @@ struct flightDataTraceStruct {
   float gyroX;
   float gyroY;
   float gyroZ;
+  float magnetometerX;
+  float magnetometerY;
+  float magnetometerZ;
   float humidity;
   float pressure;
   float temperature;
