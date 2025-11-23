@@ -471,6 +471,18 @@ void flightLoggerBase::setTraceCurrentHumidity(float humidity) {
   _flightDataTraceCurrent.humidity = humidity;
 }
 
+void flightLoggerBase::setTraceCurrentMagnetometerX(float x) {
+  _flightDataTraceCurrent.magnetometerX = x;
+}
+
+void flightLoggerBase::setTraceCurrentMagnetometerY(float y) {
+  _flightDataTraceCurrent.magnetometerY = y;
+}
+
+void flightLoggerBase::setTraceCurrentMagnetometerZ(float z) {
+  _flightDataTraceCurrent.magnetometerZ = z;
+}
+
 void flightLoggerBase::setTraceCurrentPressure(float pressure) {
   _flightDataTraceCurrent.pressure = pressure;
 }

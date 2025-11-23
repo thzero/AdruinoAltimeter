@@ -60,6 +60,9 @@ class flightLoggerBase {
     void setTraceCurrentGyroY(float y);
     void setTraceCurrentGyroZ(float z);
     void setTraceCurrentHumidity(float humidity);
+    void setTraceCurrentMagnetometerX(float x);
+    void setTraceCurrentMagnetometerY(float y);
+    void setTraceCurrentMagnetometerZ(float z);
     void setTraceCurrentPressure(float pressure);
     void setTraceCurrentTemperature(float temperature);
     void setTraceCurrentVelocity(float velocity);
