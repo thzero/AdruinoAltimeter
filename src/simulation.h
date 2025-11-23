@@ -17,12 +17,12 @@ struct simulationConfigStruct {
   float diameterMM = 0;
   float diameter = 0; // m  
   float frontalArea = 4.56e-3;      // m^20.0762 // from OR 3" rocket
-  double mass = 1.76;          // kg // from OR 3" rocket
-  double motorFuelBurnRate = 0.176;  // kg/s // from OR 3" rocket
-  double motorFuelBurnRateMicro = 0.000000176;  // kg/s // from OR 3" rocket
-  double motorFuelBurnTime = 1.6;    // kg/s // from OR 3" rocket
-  double motorFuelMass = 0.316;      // kg // from OR 3" rocket
-  double motorThrust = 2485.796;     // m/s // from OR 3" rocket
+  float mass = 1.76;          // kg // from OR 3" rocket
+  float motorFuelBurnRate = 0.176;  // kg/s // from OR 3" rocket
+  float motorFuelBurnRateMicro = 0.000000176;  // kg/s // from OR 3" rocket
+  float motorFuelBurnTime = 1.6;    // kg/s // from OR 3" rocket
+  float motorFuelMass = 0.316;      // kg // from OR 3" rocket
+  float motorThrust = 2485.796;     // m/s // from OR 3" rocket
   float parachuteArea = 0;
   float parachuteDiameterIn = 5.5;
   float parachuteDiameterMM = 0;
@@ -33,8 +33,8 @@ struct simulationConfigStruct {
 typedef enum {
 	simulationStatusAirborneAscent,
 	simulationStatusAirborneDescent,
-    simulationStatusGround,
-    simulationStatusLanded
+  simulationStatusGround,
+  simulationStatusLanded
 } simulationStatus;
 
 // Very simple, and not very realistic, simulation only on the X and Y axis.
@@ -47,55 +47,58 @@ class simulation {
     void simulationTask();
     void simulationTaskEnd();
     void simulationTaskStart();
+#if defined(EPS32)
     void simulationTaskWrapper();
+#endif
     void start(int requestedNumber, long altitudeInitial, long altitudeFinal);
     void stop();
     accelerometerValues valueAcceleration();
-    double valueAltitude();
+    gyroscopeValues valueGyroscope();
+    float valueAltitude();
 
   private:
-    double AirDensity = 1.292;        // kg/m^3
-    double AirDensityScale = 5600.0;  // m -- height at which density is halved
-    double EarthMass = 5.97e24;       // kg
-    double EarthRadius = 6.3e6;       // m
-    double GravConstant = 9.8;          // m/s^2
+    float AirDensity = 1.292;        // kg/m^3
+    float AirDensityScale = 5600.0;  // m -- height at which density is halved
+    float EarthMass = 5.97e24;       // kg
+    float EarthRadius = 6.3e6;       // m
+    float GravConstant = 9.8;          // m/s^2
     int SettleFinal = 15;
     int SettleStart = 15;
 
-    double _altitude;
-    double _acceleration;
+    float _altitude;
+    float _acceleration;
     bool _airborneApogee = false;
-    double _altitudeApogee;
-    double _altitudeApogeeMeasures;
-    double _altitudeEnding;
-    double _altitudeFlightLast;
-    double _altitudeInitial;
-    double _altitudeStarting;
+    float _altitudeApogee;
+    float _altitudeApogeeMeasures;
+    float _altitudeEnding;
+    float _altitudeFlightLast;
+    float _altitudeInitial;
+    float _altitudeStarting;
     unsigned long _burnoutTime; // microseconds
     simulationConfigStruct _config;
     JsonDocument _configs;
     unsigned long _elapsedTime;
-    double _forceDrag;
-    double _forceGravity;
-    double _forceTotal;
-    double _motorThrust;  // N
+    float _forceDrag;
+    float _forceGravity;
+    float _forceTotal;
+    float _motorThrust;  // N
     bool _running = false;
     simulationStatus _status;
     int _settleFinal;
-    double _velocity;
+    float _velocity;
 
     unsigned long _start = 0;
     int _count = 0;
     int _countHeader = 0;
     int _settle = 0;
     
-    double _maxAltitude;
-    double _maxVelocity;
+    float _maxAltitude;
+    float _maxVelocity;
     unsigned long _simulationTimestamp; // microseconds
     loopThrottle _simulationThrottle;
 
-    void evaluateTimestep(unsigned long deltaT, double drag, double Mr, double Ft);
-    void outputPrint(unsigned long delta, double mass, double thrust, double altitude, double airDensity, double drag, bool burnout, double apogeeDelta);
+    void evaluateTimestep(unsigned long deltaT, float drag, float Mr, float Ft);
+    void outputPrint(unsigned long delta, float mass, float thrust, float altitude, float airDensity, float drag, bool burnout, float apogeeDelta);
     void outputPrintHeader();
     void loopStep(unsigned long deltaT, bool output, bool outputHeader);
 };
