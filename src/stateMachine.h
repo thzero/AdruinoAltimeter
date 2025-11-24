@@ -10,8 +10,8 @@
 #include "settings.h"
 #include "stateMachineConstants.h"
 
-#define DEV
-#define DEV_SIM
+// #define DEV
+// #define DEV_SIM
 
 #define ALTITUDE_LIFTOFF 20
 
@@ -49,6 +49,7 @@ class stateMachine {
 
     int altitudeLiftoff();
     void preferencesOutput();
+    void returnToState(flightStates state);
     int sampleRateAirborneAscent();
     int sampleRateAirborneDescent();
     int sampleRateGround();

@@ -185,21 +185,68 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned lo
   // than the last recorded altitude.
 // #ifdef DEBUG_ALTIMETER
 // if (_accumulator % 100000 == 0) {
+  debug();
+  debug();
+  debug();
   debug(F("loopStateAIRBORNE_ASCENT...altitudeLast"), _flightLog->instance()->getData().altitudeLast);
   debug(F("loopStateAIRBORNE_ASCENT...altitudeDelta"), altitudeDelta);
+  debug();
+  debug();
+  debug();
+  debug(F("loopStateAIRBORNE_ASCENT...sampleMeasures.apogee"), _stateMachineSettings.sampleMeasures.apogee);
+  debug(F("loopStateAIRBORNE_ASCENT...sampleMeasures.apogee"), _stateMachineSettings.sampleMeasures.apogee);
+  debug(F("loopStateAIRBORNE_ASCENT...sampleMeasures.apogee"), _stateMachineSettings.sampleMeasures.apogee);
+  debug(F("loopStateAIRBORNE_ASCENT...sampleMeasures.apogee"), _stateMachineSettings.sampleMeasures.apogee);
+  debug(F("loopStateAIRBORNE_ASCENT...sampleMeasures.apogee"), _stateMachineSettings.sampleMeasures.apogee);
+  debug(F("loopStateAIRBORNE_ASCENT...sampleMeasures.apogee"), _stateMachineSettings.sampleMeasures.apogee);
+  debug(F("loopStateAIRBORNE_ASCENT...sampleMeasures.apogee"), _stateMachineSettings.sampleMeasures.apogee);
+  debug(F("loopStateAIRBORNE_ASCENT...sampleMeasures.apogee"), _stateMachineSettings.sampleMeasures.apogee);
+  debug(F("loopStateAIRBORNE_ASCENT...sampleMeasures.apogee"), _stateMachineSettings.sampleMeasures.apogee);
+  debug();
+  debug();
+  debug();
 // }
 // #endif
   if (altitudeDelta < 0) {
+// #ifdef DEBUG_ALTIMETER
+    debug();
+    debug();
+    debug();
+    debug(F("loopStateAIRBORNE_ASCENT...measures1"), _flightLog->measures);
+    debug(F("loopStateAIRBORNE_ASCENT...sampleMeasures.apogee"), _stateMachineSettings.sampleMeasures.apogee);
+    debug(F("loopStateAIRBORNE_ASCENT...FirstMeasure?"), (_flightLog->measures == _stateMachineSettings.sampleMeasures.apogee));
+    debug();
+    debug();
+    debug();
+// #endif
     if (_flightLog->measures == _stateMachineSettings.sampleMeasures.apogee) {
+      debug();
+      debug();
+      debug();
+      debug(F("loopStateAIRBORNE_ASCENT...altitudeLast"), _flightLog->instance()->getData().altitudeLast);
+      debug();
+      debug();
+      debug();
       _flightLog->instance()->setAltitudeApogeeFirstMeasure(_flightLog->instance()->getData().altitudeLast);
+      debug();
+      debug();
+      debug();
+      debug(F("loopStateAIRBORNE_ASCENT...altitudeApogeeFirstMeasure"), _flightLog->instance()->getData().altitudeApogeeFirstMeasure);
+      debug();
+      debug();
+      debug();
       _flightLog->instance()->setTimestampApogeeFirstMeasure(currentTimestamp);
     }
-    _flightLog->measures = _flightLog->measures - 1;
 // #ifdef DEBUG_ALTIMETER
-  if (altitudeDelta < 0) {
-    debug(F("loopStateAIRBORNE_ASCENT...measures"), _flightLog->measures);
-    }
+    debug();
+    debug();
+    debug();
+    debug(F("loopStateAIRBORNE_ASCENT...measures2"), _flightLog->measures);
+    debug();
+    debug();
+    debug();
 // #endif
+    _flightLog->measures = _flightLog->measures - 1;
     if (_flightLog->measures == 0) {
       // Detected apogee.
       debug();
@@ -210,7 +257,13 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned lo
   else {
     if (_flightLog->measures < _stateMachineSettings.sampleMeasures.apogee) {
 // #ifdef DEBUG_ALTIMETER
+      debug();
+      debug();
+      debug();
       debug(F("loopStateAIRBORNE_ASCENT...measures"), F("reset"));
+      debug();
+      debug();
+      debug();
 // #endif
       // If the current is greater than the last, then reset as it was potentially
       // a false positive.
@@ -252,14 +305,23 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned lo
 }
 
 void stateMachine::loopStateAIRBORNE_ASCENTToAIRBORNE_DESCENT(unsigned long timestamp, unsigned long deltaElapsed) {
-  // _flightLog->instance()->setAltitudeApogee(_flightLog->instance()->getData().altitudeApogeeFirstMeasure);
-  // _flightLog->instance()->setTimestampApogee(_flightLog->instance()->getData().timestampApogeeFirstMeasure);
+  _flightLog->instance()->setAltitudeApogee(_flightLog->instance()->getData().altitudeApogeeFirstMeasure);
+  _flightLog->instance()->setTimestampApogee(_flightLog->instance()->getData().timestampApogeeFirstMeasure);
 
   debug();
   debug();
   debug();
   debug();
   debug(F("...DESCENT!!!!"));
+  debug(F("...DESCENT!!!!"));
+  debug();
+  debug();
+  debug();
+  debug(F("loopStateAIRBORNE_ASCENTToAIRBORNE_DESCENT...altitudeApogeeFirstMeasure"), _flightLog->instance()->getData().altitudeApogeeFirstMeasure);
+  debug(F("loopStateAIRBORNE_ASCENTToAIRBORNE_DESCENT...altitudeApogeeFirstMeasure"), _flightLog->instance()->getData().altitudeApogee);
+  debug();
+  debug();
+  debug();
   debug(F("...DESCENT!!!!"));
   debug(F("...DESCENT!!!!"));
   debug();
@@ -719,6 +781,10 @@ void stateMachine::reset() {
   Serial.println(F("...state machine reset successful."));
 }
 
+void stateMachine::returnToState(flightStates state) {
+  _loopState = state;
+}
+
 int stateMachine::sampleRateAirborneAscent() {
   return _sampleRateAirborneAscent;
 }
@@ -747,10 +813,30 @@ void stateMachine::save(int altitudeLiftoff, int sampleRateAirborneAscent, int s
   _displaySettings();
 #endif
 
+  debug();
+  debug();
+  debug();
+  debug(F("save"), 0);
+  debug(F("setup..._flightLog->measures"), _flightLog->measures);
+  debug(F("setup..._stateMachineSettings.sampleMeasures.apogee?"), _stateMachineSettings.sampleMeasures.apogee);
+  debug();
+  debug();
+  debug();
+
   _altitudeLiftoff = _checkValues(altitudeLiftoffValues, altitudeLiftoff, _stateMachineSettings.altitudeLiftoff, sizeof(altitudeLiftoffValues) / sizeof(altitudeLiftoffValues[0]));
   _sampleRateAirborneAscent = _checkValues(sampleRateAirborneAscentValues, sampleRateAirborneAscent, _stateMachineSettings.sampleRates.airborneAscent, sizeof(sampleRateAirborneAscentValues) / sizeof(sampleRateAirborneAscentValues[0]));
   _sampleRateAirborneDescent = _checkValues(sampleRateAirborneDecentValues, sampleRateAirborneDecent, _stateMachineSettings.sampleRates.airborneDescent, sizeof(sampleRateAirborneDecentValues) / sizeof(sampleRateAirborneDecentValues[0]));
   _sampleRateGround = _checkValues(sampleRateGroundValues, sampleRateGround, _stateMachineSettings.sampleRates.ground, sizeof(sampleRateGroundValues) / sizeof(sampleRateGroundValues[0]));
+
+  debug();
+  debug();
+  debug();
+  debug(F("save"), 1);
+  debug(F("setup..._flightLog->measures"), _flightLog->measures);
+  debug(F("setup..._stateMachineSettings.sampleMeasures.apogee?"), _stateMachineSettings.sampleMeasures.apogee);
+  debug();
+  debug();
+  debug();
   
 #ifdef DEBUG
   Serial.println(F("\t\t...state machine... save checked"));
@@ -762,7 +848,19 @@ void stateMachine::save(int altitudeLiftoff, int sampleRateAirborneAscent, int s
   Serial.println(_sampleRateAirborneDescent);
   Serial.print(F("\t\t_sampleRateGround="));
   Serial.println(_sampleRateGround);
+  Serial.print(F("\t\t_sampleRateGround="));
+  Serial.println(_sampleRateGround);
 #endif
+
+  debug();
+  debug();
+  debug();
+  debug(F("save"), 2);
+  debug(F("setup..._flightLog->measures"), _flightLog->measures);
+  debug(F("setup..._stateMachineSettings.sampleMeasures.apogee?"), _stateMachineSettings.sampleMeasures.apogee);
+  debug();
+  debug();
+  debug();
 
   if (_settingsSaveFunc != nullptr)
     _settingsSaveFunc(_stateMachineSettings);
@@ -776,6 +874,16 @@ void stateMachine::save(int altitudeLiftoff, int sampleRateAirborneAscent, int s
   // preferences.end();
 #endif
 
+  debug();
+  debug();
+  debug();
+  debug(F("save"), 3);
+  debug(F("setup..._flightLog->measures"), _flightLog->measures);
+  debug(F("setup..._stateMachineSettings.sampleMeasures.apogee?"), _stateMachineSettings.sampleMeasures.apogee);
+  debug();
+  debug();
+  debug();
+
   _altitudeGround = _altitudeLiftoff / 2;
 
 #ifdef DEBUG
@@ -783,6 +891,16 @@ void stateMachine::save(int altitudeLiftoff, int sampleRateAirborneAscent, int s
   _displaySettings();
   Serial.println(F(""));
 #endif
+
+  debug();
+  debug();
+  debug();
+  debug(F("save"), 4);
+  debug(F("setup..._flightLog->measures"), _flightLog->measures);
+  debug(F("setup..._stateMachineSettings.sampleMeasures.apogee?"), _stateMachineSettings.sampleMeasures.apogee);
+  debug();
+  debug();
+  debug();
 
   Serial.println(F("\t...state machine save successful."));
 }
@@ -829,17 +947,42 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
   // preferences.end();
 #endif
 
-  _stateMachineSettings.altitudeLiftoff = ALTITUDE_LIFTOFF;
-  _stateMachineSettings.sampleRates.airborneAscent = SAMPLE_RATE_AIRBORNE_ASCENT;
-  _stateMachineSettings.sampleRates.airborneDescent = SAMPLE_RATE_AIRBORNE_DESCENT;
-  _stateMachineSettings.sampleRates.ground = SAMPLE_RATE_GROUND;
-  _stateMachineSettings.sampleRates.aborted = SAMPLE_MEASURES_ABORTED;
-  _stateMachineSettings.sampleRates.landed = SAMPLE_RATE_LANDED;
+  if (_stateMachineSettings.altitudeLiftoff <= 0)
+    _stateMachineSettings.altitudeLiftoff = ALTITUDE_LIFTOFF;
+  if (_stateMachineSettings.sampleRates.airborneAscent <= 0)
+    _stateMachineSettings.sampleRates.airborneAscent = SAMPLE_RATE_AIRBORNE_ASCENT;
+  if (_stateMachineSettings.sampleRates.airborneDescent <= 0)
+    _stateMachineSettings.sampleRates.airborneDescent = SAMPLE_RATE_AIRBORNE_DESCENT;
+  if (_stateMachineSettings.sampleRates.ground <= 0)
+    _stateMachineSettings.sampleRates.ground = SAMPLE_RATE_GROUND;
+
+  // _stateMachineSettings.altitudeLiftoff = ALTITUDE_LIFTOFF;
+  // _stateMachineSettings.sampleRates.aborted = SAMPLE_MEASURES_ABORTED;
+  // _stateMachineSettings.sampleRates.landed = SAMPLE_RATE_LANDED;
+  _stateMachineSettings.sampleMeasures.aborted = SAMPLE_MEASURES_ABORTED;
+  _stateMachineSettings.sampleMeasures.apogee = SAMPLE_MEASURES_APOGEE;
+  _stateMachineSettings.sampleMeasures.landed = SAMPLE_MEASURES_LANDED;
+  debug();
+  debug();
+  debug();
+  debug(F("setup..._stateMachineSettings.sampleMeasures.apogee?"), _stateMachineSettings.sampleMeasures.apogee);
+  debug();
+  debug();
+  debug();
 
   _altitudeLiftoff = _stateMachineSettings.altitudeLiftoff;
   _sampleRateAirborneAscent = _stateMachineSettings.sampleRates.airborneAscent;
   _sampleRateAirborneDescent = _stateMachineSettings.sampleRates.airborneDescent;
   _sampleRateGround = _stateMachineSettings.sampleRates.ground;
+
+  _flightLog->measures = _stateMachineSettings.sampleMeasures.apogee;
+  debug();
+  debug();
+  debug();
+  debug(F("setup..._flightLog->measures"), _flightLog->measures);
+  debug();
+  debug();
+  debug();
 
   _altitudeGround = _altitudeLiftoff / 2;
 
@@ -847,7 +990,25 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
   _displaySettings();
   Serial.println(F(""));
 
+  debug();
+  debug();
+  debug();
+  debug(F("setup..._flightLog->measures"), _flightLog->measures);
+  debug(F("setup..._stateMachineSettings.sampleMeasures.apogee?"), _stateMachineSettings.sampleMeasures.apogee);
+  debug();
+  debug();
+  debug();
+
   save(_altitudeLiftoff, _sampleRateAirborneAscent, _sampleRateAirborneDescent, _sampleRateGround);
+
+  debug();
+  debug();
+  debug();
+  debug(F("setup..._flightLog->measures"), _flightLog->measures);
+  debug(F("setup..._stateMachineSettings.sampleMeasures.apogee?"), _stateMachineSettings.sampleMeasures.apogee);
+  debug();
+  debug();
+  debug();
 
   Serial.println(F("...state machine setup successful."));
   Serial.println();
@@ -901,6 +1062,10 @@ void stateMachine::_displaySettings() {
   Serial.print(_sampleRateAirborneDescent);
   Serial.print(F(", default="));
   Serial.println(_stateMachineSettings.sampleRates.airborneDescent);
+  Serial.print(F("\tsampleRateGround="));
+  Serial.print(_sampleRateGround);
+  Serial.print(F(", default="));
+  Serial.println(_stateMachineSettings.sampleRates.ground);
   Serial.print(F("\tsampleRateGround="));
   Serial.print(_sampleRateGround);
   Serial.print(F(", default="));
