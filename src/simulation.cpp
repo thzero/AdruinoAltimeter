@@ -24,11 +24,11 @@ void simulation::evaluateTimestep(unsigned long deltaT, float drag, float Mr, fl
   // Serial.printf("%f\n", GravConstant);
   // Serial.print(F("Mr: "));
   // Serial.println(Mr);
-  // Serial.print(F("_altitude: "));
-  // Serial.println(_altitude);
+  // Serial.print(F("_altitudeCurrent: "));
+  // Serial.println(_altitudeCurrent);
 
   // Compute the total force
-  // float F = (-1 * GravConstant) * EarthRadius * Mr / pow(_altitude, 2);  // this is tyring to get change gravity based on radius from center of earth
+  // float F = (-1 * GravConstant) * EarthRadius * Mr / pow(_altitudeCurrent, 2);  // this is tyring to get change gravity based on radius from center of earth
   // Fd = .5 V^2 drag, drag = (rho Cd A)
   float dragSign = (_velocity < 0) ? 1.0 : -1.0;
   // Serial.print(F("dragSign: "));
@@ -68,14 +68,15 @@ void simulation::evaluateTimestep(unsigned long deltaT, float drag, float Mr, fl
     // Serial.println(_velocity);
 
   // Move the position
-  _altitude += deltaF * _velocity;
-    // Serial.print(F("_altitude: "));
-    // Serial.println(_altitude);
+  _altitudeCurrent += deltaF * _velocity;
+    // Serial.print(F("_altitudeCurrent: "));
+    // Serial.println(_altitudeCurrent);
 }
 
 void simulation::loopStep(unsigned long deltaT, bool output, bool outputHeader) {
   // Altitude is the flight altitude minus starting altitude.
-  float altitudeFlight = _altitude - _altitudeStarting;
+  // float altitudeFlight = _altitudeCurrent - _altitudeInitial;
+  float altitudeFlight = _altitudeCurrent;
   float airDensity = AirDensity * pow(0.5, altitudeFlight / AirDensityScale);
 
   float mass = _config.mass;
@@ -263,7 +264,7 @@ void simulation::outputPrint(unsigned long delta, float mass, float thrust, floa
   // Serial.print(temp);
   // Serial.print(stringPad(temp, 14));
 
-  // sprintf(temp, formatFloat, _altitudeStarting);
+  // sprintf(temp, formatFloat, _altitudeInitial);
   // Serial.print(temp);
   // Serial.print(stringPad(temp, 14));
 
@@ -468,7 +469,7 @@ int8_t simulation::setup(JsonDocument configs) {
   return 0;
 }
 
-void simulation::start(int requestedNumber, long altitudeInitial, long altitudeFinal) {
+void simulation::start(int requestedNumber, float altitudeInitial, float altitudeFinal) {
   Serial.println();
   Serial.println(F("Simulation Started"));
 
@@ -562,8 +563,6 @@ void simulation::start(int requestedNumber, long altitudeInitial, long altitudeF
   _config = startConfig;
   
   Serial.println();
-  Serial.print("AltitudeInitial: ");
-  Serial.println(altitudeInitial, 5);
   Serial.print("DiameterIn: ");
   Serial.println(startConfig.diameterIn, 5);
   Serial.print("DiameterMM: ");
@@ -597,7 +596,12 @@ void simulation::start(int requestedNumber, long altitudeInitial, long altitudeF
   _status = simulationStatusGround;
   _acceleration = 0.0; // acceleration
   _airborneApogee = false;
-  _altitude = altitudeInitial; // initial position
+  _altitudeApogee = -1;
+  _altitudeApogeeMeasures = SAMPLE_MEASURES_APOGEE;
+  _altitudeCurrent = altitudeInitial; // initial position
+  _altitudeEnding = altitudeFinal;
+  _altitudeInitial = altitudeInitial;
+  _altitudeFlightLast = 0;
   _burnoutTime = _config.motorFuelBurnTime * 1000 * 1000;
   _count = 0;
   _countHeader = 0;
@@ -605,15 +609,19 @@ void simulation::start(int requestedNumber, long altitudeInitial, long altitudeF
   _maxAltitude = 0;
   _maxVelocity = 0;
   _motorThrust = _config.motorThrust; // N
-  _altitudeApogee = -1;
-  _altitudeApogeeMeasures = SAMPLE_MEASURES_APOGEE;
-  _altitudeEnding = altitudeFinal;
-  _altitudeInitial = altitudeInitial;
-  _altitudeFlightLast = 0;
-  _altitudeStarting = altitudeInitial;
   _settle = 0;
   _settleFinal = 0;
   _velocity = 0.0; // velocity
+
+  Serial.print("altitudeInitial: ");
+  Serial.println(altitudeInitial, 5);
+  Serial.print("_altitudeCurrent: ");
+  Serial.println(_altitudeCurrent, 5);
+  Serial.print("_altitudeInitial: ");
+  Serial.println(_altitudeInitial, 5);
+  Serial.print("_altitudeEnding: ");
+  Serial.println(_altitudeEnding, 5);
+  Serial.println();
   
   _running = true;
 
@@ -642,7 +650,7 @@ float simulation::valueAltitude() {
 #if defined(DEBUG_SIM) || defined(DEBUG_SIM_OUTPUT)
   debug("simulation.altitude", _altitude);
 #endif
-  return _altitude;
+  return _altitudeCurrent;
 }
 
 accelerometerValues simulation::valueAcceleration() {

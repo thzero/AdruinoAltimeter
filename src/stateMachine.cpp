@@ -155,20 +155,20 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned lo
   // Determine different in time between the last step...
   unsigned long currentTimestamp = timestamp - _flightLog->instance()->getData().timestampLaunch;
   unsigned long diffTime = currentTimestamp - _flightLog->instance()->getData().timestampPrevious;
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
 // if (_accumulator % 100000 == 0) {
   debug(F("loopStateAIRBORNE_ASCENT...timestamp"), timestamp);
   debug(F("loopStateAIRBORNE_ASCENT...currentTimestamp"), currentTimestamp);
   debug(F("loopStateAIRBORNE_ASCENT...diffTime"), diffTime);
 // }
-// #endif
+#endif
   
   atmosphereValues atmosphereValuesO = readSensorAtmosphere();
   float altitude = atmosphereValuesO.altitude;
   _flightLog->instance()->setAltitudeCurrent(altitude);
   float altitudeDelta = altitude - _flightLog->instance()->getData().altitudeLast;
 
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
 // if (_accumulator % 100000 == 0) {
 #if defined(DEV) && defined(DEV_SIM)
   debug(F("loopStateAIRBORNE_ASCENT..._simulation.isRunning"), _simulation.isRunning());
@@ -177,13 +177,13 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned lo
   debug(F("loopStateAIRBORNE_ASCENT...currentTimestamp"), currentTimestamp);
   debug(F("loopStateAIRBORNE_ASCENT...diffTime"), diffTime);
 // }
-// #endif
+#endif
 
   _updateTrace(currentTimestamp, diffTime, atmosphereValuesO, altitudeDelta);
 
   // Detect apogee by taking X number of measures as long as the current is less
   // than the last recorded altitude.
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
 // if (_accumulator % 100000 == 0) {
   debug();
   debug();
@@ -206,9 +206,9 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned lo
   debug();
   debug();
 // }
-// #endif
+#endif
   if (altitudeDelta < 0) {
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
     debug();
     debug();
     debug();
@@ -218,7 +218,7 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned lo
     debug();
     debug();
     debug();
-// #endif
+#endif
     if (_flightLog->measures == _stateMachineSettings.sampleMeasures.apogee) {
       debug();
       debug();
@@ -237,7 +237,7 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned lo
       debug();
       _flightLog->instance()->setTimestampApogeeFirstMeasure(currentTimestamp);
     }
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
     debug();
     debug();
     debug();
@@ -245,7 +245,7 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned lo
     debug();
     debug();
     debug();
-// #endif
+#endif
     _flightLog->measures = _flightLog->measures - 1;
     if (_flightLog->measures == 0) {
       // Detected apogee.
@@ -256,7 +256,7 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned lo
   } 
   else {
     if (_flightLog->measures < _stateMachineSettings.sampleMeasures.apogee) {
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
       debug();
       debug();
       debug();
@@ -264,7 +264,7 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned lo
       debug();
       debug();
       debug();
-// #endif
+#endif
       // If the current is greater than the last, then reset as it was potentially
       // a false positive.
       _flightLog->instance()->setAltitudeApogeeFirstMeasure(0);
@@ -276,11 +276,11 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned lo
 
   // Check for timeouts...
   bool timestampApogeeCheck = currentTimestamp > _stateMachineSettings.timeOutTimeToApogee;
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
   debug(F("loopStateAIRBORNE_ASCENT...timeOutTimeToApogee"), _stateMachineSettings.timeOutTimeToApogee);
   debug(F("loopStateAIRBORNE_ASCENT...currentTimestamp"), currentTimestamp);
   debug(F("loopStateAIRBORNE_ASCENT...timestampApogeeCheck"), timestampApogeeCheck);
-// #endif
+#endif
   if (timestampApogeeCheck) {
     debug();
     // Something went wrong and apogee was never found, so abort!
@@ -289,12 +289,12 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned lo
   }
 
   bool timeoutRecordingCheck = currentTimestamp > _stateMachineSettings.timeoutRecording;
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
   debug(F("loopStateAIRBORNE_ASCENT...timestampLaunch"), _flightLog->instance()->getData().timestampLaunch);
   debug(F("loopStateAIRBORNE_ASCENT...timeoutRecording"), _stateMachineSettings.timeoutRecording);
   debug(F("loopStateAIRBORNE_ASCENT...currentTimestamp"), currentTimestamp);
   debug(F("loopStateAIRBORNE_ASCENT...timeoutRecordingCheck"), timeoutRecordingCheck);
-// #endif
+#endif
   if (timeoutRecordingCheck) {
     debug();
     // Something went wrong., so abort!
@@ -353,20 +353,20 @@ void stateMachine::loopStateAIRBORNE_DESCENT(unsigned long timestamp, unsigned l
   // Determine different in time between the last step...
   long currentTimestamp = timestamp - _flightLog->instance()->getData().timestampLaunch;
   long diffTime = currentTimestamp - _flightLog->instance()->getData().timestampPrevious;
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
 // if (_accumulator % 100000 == 0) {
   debug(F("loopStateAIRBORNE_DESCENT...timestamp"), timestamp);
   debug(F("loopStateAIRBORNE_DESCENT...currentTimestamp"), currentTimestamp);
   debug(F("loopStateAIRBORNE_DESCENT...diffTime"), diffTime);
 // }
-// #endif
+#endif
   
   atmosphereValues atmosphereValuesO = readSensorAtmosphere();
   float altitude = atmosphereValuesO.altitude;
   _flightLog->instance()->setAltitudeCurrent(altitude);
   float altitudeDelta = altitude - _flightLog->instance()->getData().altitudeLast;
 
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
 // if (_accumulator % 100000 == 0) {
 #if defined(DEV) && defined(DEV_SIM)
   debug(F("loopStateAIRBORNE_DESCENT..._simulation.isRunning"), _simulation.isRunning());
@@ -376,16 +376,16 @@ void stateMachine::loopStateAIRBORNE_DESCENT(unsigned long timestamp, unsigned l
   debug(F("loopStateAIRBORNE_DESCENT...currentTimestamp"), currentTimestamp);
   debug(F("loopStateAIRBORNE_DESCENT...diffTime"), diffTime);
 // }
-// #endif
+#endif
 
   _updateTrace(currentTimestamp, diffTime, atmosphereValuesO, altitudeDelta);
 
   bool timeoutRecordingCheck = ((timestamp - _flightLog->instance()->getData().timestampLaunch) > _stateMachineSettings.timeoutRecording);
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
   debug(F("loopStateAIRBORNE_DESCENT...timestamp"), timestamp);
   debug(F("loopStateAIRBORNE_DESCENT...timestampLaunch"), _flightLog->instance()->getData().timestampLaunch);
   debug(F("loopStateAIRBORNE_DESCENT...timeoutRecordingCheck"), timeoutRecordingCheck);
-// #endif
+#endif
 
   if (timeoutRecordingCheck) {
     debug();
@@ -397,16 +397,16 @@ void stateMachine::loopStateAIRBORNE_DESCENT(unsigned long timestamp, unsigned l
   float altitudeCurrent = _flightLog->instance()->getData().altitudeCurrent;
   float altitudeLandingTarget = _flightLog->altitudeInitial + _altitudeGround;
   bool altitudeCheck = altitudeCurrent < altitudeLandingTarget;
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
   debug(F("loopStateAIRBORNE_DESCENT...altitudeCurrent"), altitudeCurrent);
   debug(F("loopStateAIRBORNE_DESCENT...altitudeGround"), _altitudeGround);
   debug(F("loopStateAIRBORNE_DESCENT...altitudeLandingTarget"), altitudeLandingTarget);
   debug(F("loopStateAIRBORNE_DESCENT...altitudeCheck"), altitudeCheck);
-// #endif
+#endif
   if (altitudeCheck) {
     debug();
-  _flightLog->instance()->setAltitudeTouchdown(_flightLog->instance()->getData().altitudeLast);
-  _flightLog->instance()->setTimestampTouchdown(_flightLog->instance()->getData().timestampPrevious);
+    _flightLog->instance()->setAltitudeTouchdown(_flightLog->instance()->getData().altitudeLast);
+    _flightLog->instance()->setTimestampTouchdown(_flightLog->instance()->getData().timestampPrevious);
     // Passed the descent touchdown altitude check, so the flight log is ended and return to GROUND
     loopStateAIRBORNE_DESCENTToLANDED(timestamp, deltaElapsed);
     return;
@@ -424,8 +424,10 @@ void stateMachine::loopStateAIRBORNE_DESCENTToLANDED(unsigned long timestamp, un
     _simulation.stop();
 #endif
 
+  _flightLog->aborted = false;
   _flightLog->airborne = false;
   _flightLog->recording = false;
+  _flightLog->touchdown = true;
 
   debug();
   debug();
@@ -522,8 +524,10 @@ void stateMachine::loopStateGROUND(unsigned long timestamp, unsigned long deltaE
 
   _accumulator++;
 
-  debug(F("stateGROUND..._sampleRateGround"), _sampleRateGround);
-  debug(F("stateGROUND...delta"), delta);
+#ifdef DEBUG_ALTIMETER
+  debug(F("loopStateGROUND..._sampleRateGround"), _sampleRateGround);
+  debug(F("loopStateGROUND...delta"), delta);
+#endif
   
   if (_loopStateThrottledFunc != nullptr)
     _loopStateThrottledFunc(_loopState, timestamp, deltaElapsed);
@@ -531,7 +535,7 @@ void stateMachine::loopStateGROUND(unsigned long timestamp, unsigned long deltaE
   // Get the current altitude and determine the delta from initial.
   float altitude = readSensorAltitude();
   float altitudeLaunchApogeeTarget = _flightLog->altitudeInitial + _altitudeLiftoff;
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
 //   debug(F("stateGROUND...processing, delta"), delta);
 //   debug(F("stateGROUND...processing, deltaElapsed"), deltaElapsed);
 // if (_accumulator % 100000 == 0) {
@@ -544,7 +548,7 @@ void stateMachine::loopStateGROUND(unsigned long timestamp, unsigned long deltaE
   debug(F("loopStateGROUND...altitudeLaunchApogeeTarget"), altitudeLaunchApogeeTarget);
   debug(F("loopStateGROUND...altitudeLiftoff?"), (altitude > altitudeLaunchApogeeTarget));
 // }
-// #endif
+#endif
 
   // Check for whether we've left the ground
   if (altitude > altitudeLaunchApogeeTarget) {
@@ -663,19 +667,19 @@ accelerometerValues stateMachine::readSensorAccelerometer() {
 
 float stateMachine::readSensorAltitude() {
 #if defined(DEV) && defined(DEV_SIM)
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
 // if (_accumulator % 100000 == 0) {
   Serial.println(F("readSensorAltitude...dev...checking if simulation is running"));
 // }
-// #endif
+#endif
   if (_simulation.isRunning()) {
     float altitude = _simulation.valueAltitude();
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
 // if (_accumulator % 100000 == 0) {
     Serial.print(F("readSensorAltitude...dev...reading altitude from sim..."));
     Serial.println(altitude);
 // }
-// #endif
+#endif
     return altitude;
   }
 #endif
@@ -688,22 +692,22 @@ float stateMachine::readSensorAltitude() {
 
 atmosphereValues stateMachine::readSensorAtmosphere() {
 #if defined(DEV) && defined(DEV_SIM)
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
 // if (_accumulator % 100000 == 0) {
 //   Serial.println(F("readSensorAtmosphere...dev...checking if simulation is running"));
 // }
-// #endif
+#endif
   if (_simulation.isRunning()) {
     atmosphereValues values;
     values.altitude = _simulation.valueAltitude();
     values.humidity = 0;
     values.pressure = 0;
     values.temperature = 0;
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
 // if (_accumulator % 100000 == 0) {
     // Serial.println(F("readSensorAtmosphere...dev...reading atmosphere from sim..."));
 // }
-// #endif
+#endif
     return values;
   }
 #endif
@@ -716,21 +720,21 @@ atmosphereValues stateMachine::readSensorAtmosphere() {
 
 gyroscopeValues stateMachine::readSensorGyroscope() {
 #if defined(DEV) && defined(DEV_SIM)
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
 // if (_accumulator % 100000 == 0) {
 //   Serial.println(F("readSensorGyroscope...dev...checking if simulation is running"));
 // }
-// #endif
+#endif
   if (_simulation.isRunning()) {
     gyroscopeValues values;
     values.x = 0;
     values.y = 0;
     values.z = 0;
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
 // if (_accumulator % 100000 == 0) {
 //     Serial.println(F("readSensorGyroscope...dev...reading gyroscope from sim..."));
 // }
-// #endif
+#endif
     return values;
   }
 #endif
@@ -743,21 +747,21 @@ gyroscopeValues stateMachine::readSensorGyroscope() {
 
 magnetometerValues stateMachine::readSensorMagnetometer() {
 #if defined(DEV) && defined(DEV_SIM)
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
 // if (_accumulator % 100000 == 0) {
 //   Serial.println(F("readSensorMagnetometer...dev...checking if simulation is running"));
 // }
-// #endif
+#endif
   if (_simulation.isRunning()) {
     magnetometerValues values;
     values.x = 0;
     values.y = 0;
     values.z = 0;
-// #ifdef DEBUG_ALTIMETER
+#ifdef DEBUG_ALTIMETER
 // if (_accumulator % 100000 == 0) {
 //     Serial.println(F("readSensorMagnetometer...dev...reading magnetometer from sim..."));
 // }
-// #endif
+#endif
     return values;
   }
 #endif

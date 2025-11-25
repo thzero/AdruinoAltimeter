@@ -50,7 +50,7 @@ class simulation {
 #if defined(EPS32)
     void simulationTaskWrapper();
 #endif
-    void start(int requestedNumber, long altitudeInitial, long altitudeFinal);
+    void start(int requestedNumber, float altitudeInitial, float altitudeFinal);
     void stop();
     accelerometerValues valueAcceleration();
     gyroscopeValues valueGyroscope();
@@ -65,15 +65,14 @@ class simulation {
     int SettleFinal = 15;
     int SettleStart = 15;
 
-    float _altitude;
     float _acceleration;
     bool _airborneApogee = false;
     float _altitudeApogee;
     float _altitudeApogeeMeasures;
+    float _altitudeCurrent;
     float _altitudeEnding;
     float _altitudeFlightLast;
     float _altitudeInitial;
-    float _altitudeStarting;
     unsigned long _burnoutTime; // microseconds
     simulationConfigStruct _config;
     JsonDocument _configs;

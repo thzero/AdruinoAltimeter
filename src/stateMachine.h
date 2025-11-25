@@ -10,8 +10,9 @@
 #include "settings.h"
 #include "stateMachineConstants.h"
 
-// #define DEV
-// #define DEV_SIM
+#define DEV
+#define DEV_SIM
+// #define DEBUG_ALTIMETER
 
 #define ALTITUDE_LIFTOFF 20
 
