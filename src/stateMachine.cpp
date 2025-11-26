@@ -249,7 +249,6 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned lo
     _flightLog->measures = _flightLog->measures - 1;
     if (_flightLog->measures == 0) {
       // Detected apogee.
-      debug();
       loopStateAIRBORNE_ASCENTToAIRBORNE_DESCENT(timestamp, deltaElapsed);
       return;
     }
@@ -282,7 +281,6 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned lo
   debug(F("loopStateAIRBORNE_ASCENT...timestampApogeeCheck"), timestampApogeeCheck);
 #endif
   if (timestampApogeeCheck) {
-    debug();
     // Something went wrong and apogee was never found, so abort!
     loopStateAIRBORNEToABORTED(timestamp, deltaElapsed, F("Time to apogee threshold exceeded!"), F("AIRBORNE_ASCENT aborted, returning to GROUND!!!!"));
     return;
@@ -296,12 +294,10 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned lo
   debug(F("loopStateAIRBORNE_ASCENT...timeoutRecordingCheck"), timeoutRecordingCheck);
 #endif
   if (timeoutRecordingCheck) {
-    debug();
     // Something went wrong., so abort!
     loopStateAIRBORNEToABORTED(timestamp, deltaElapsed, F("Time to apogee threshold exceeded!"), F("AIRBORNE_ASCENT aborted, returning to GROUND!!!!"));
     return;
   }
-  debug();
 }
 
 void stateMachine::loopStateAIRBORNE_ASCENTToAIRBORNE_DESCENT(unsigned long timestamp, unsigned long deltaElapsed) {
@@ -388,7 +384,6 @@ void stateMachine::loopStateAIRBORNE_DESCENT(unsigned long timestamp, unsigned l
 #endif
 
   if (timeoutRecordingCheck) {
-    debug();
     // Something went wrong and the recordingt timeout was hit, so abort!
     loopStateAIRBORNEToABORTED(timestamp, deltaElapsed, F("Exceeded recording timeout!"), F("AIRBORNE_DESCENT aborted, returning to GROUND!!!!"));
     return;
@@ -404,15 +399,12 @@ void stateMachine::loopStateAIRBORNE_DESCENT(unsigned long timestamp, unsigned l
   debug(F("loopStateAIRBORNE_DESCENT...altitudeCheck"), altitudeCheck);
 #endif
   if (altitudeCheck) {
-    debug();
     _flightLog->instance()->setAltitudeTouchdown(_flightLog->instance()->getData().altitudeLast);
     _flightLog->instance()->setTimestampTouchdown(_flightLog->instance()->getData().timestampPrevious);
     // Passed the descent touchdown altitude check, so the flight log is ended and return to GROUND
     loopStateAIRBORNE_DESCENTToLANDED(timestamp, deltaElapsed);
     return;
   }
-  
-  debug();
 }
 
 void stateMachine::loopStateAIRBORNE_DESCENTToLANDED(unsigned long timestamp, unsigned long deltaElapsed) {
@@ -552,6 +544,7 @@ void stateMachine::loopStateGROUND(unsigned long timestamp, unsigned long deltaE
 
   // Check for whether we've left the ground
   if (altitude > altitudeLaunchApogeeTarget) {
+#ifdef DEBUG_ALTIMETER
     debug();
     debug();
     debug();
@@ -567,12 +560,11 @@ void stateMachine::loopStateGROUND(unsigned long timestamp, unsigned long deltaE
     debug();
     debug();
     debug();
+#endif
     // Transition to the AIRBORNE_ASCENT ascent stage.
     loopStateGROUNDToAIRBORNE_ASCENT(timestamp, deltaElapsed);
     return;
   }
-  
-  debug();
 }
 
 void stateMachine::loopStateGROUNDToAIRBORNE_ASCENT(unsigned long timestamp, unsigned long deltaElapsed) {
@@ -893,7 +885,7 @@ void stateMachine::save(int altitudeLiftoff, int sampleRateAirborneAscent, int s
 #ifdef DEBUG
   Serial.println(F("\t\t...state machine... saved state"));
   _displaySettings();
-  Serial.println(F(""));
+  Serial.println();
 #endif
 
   debug();
@@ -992,7 +984,7 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
 
   Serial.println(F("\t...state machine settings..."));
   _displaySettings();
-  Serial.println(F(""));
+  Serial.println();
 
   debug();
   debug();
