@@ -360,7 +360,7 @@ bool flightLoggerBase::outputSerialList() {
 
 #if defined(DEBUG) && defined(DEBUG_FLIGHT_LOGGER)
   serializeJson(flightLogs, Serial);
-  Serial.println(F(""));
+  Serial.println();
 #endif
   
   Serial.println(F("$start;"));
