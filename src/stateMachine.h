@@ -50,7 +50,7 @@ class stateMachine {
 
     int altitudeLiftoff();
     void preferencesOutput();
-    void returnToState(flightStates state);
+    void returnToGround();
     int sampleRateAirborneAscent();
     int sampleRateAirborneDescent();
     int sampleRateGround();

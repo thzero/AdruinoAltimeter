@@ -777,8 +777,11 @@ void stateMachine::reset() {
   Serial.println(F("...state machine reset successful."));
 }
 
-void stateMachine::returnToState(flightStates state) {
-  _loopState = state;
+void stateMachine::returnToGround() {
+  if (_loopState == FLIGHT_STATE_ABORTED)
+    loopStateABORTEDToGROUND(0, 0);
+  else if (_loopState == FLIGHT_STATE_LANDED)
+    loopStateLANDEDToGROUND(0, 0);
 }
 
 int stateMachine::sampleRateAirborneAscent() {
