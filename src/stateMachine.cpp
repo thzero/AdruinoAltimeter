@@ -886,9 +886,10 @@ void stateMachine::save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent,
   Serial.println(sampleRateGround);
 
   Serial.println(F("\t\t...state machine... save current"));
-  _displaySettings();
 #endif
+  _displaySettings();
 
+#ifdef DEBUG
   debug();
   debug();
   debug();
@@ -898,12 +899,14 @@ void stateMachine::save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent,
   debug();
   debug();
   debug();
+#endif
 
   _altitudeOffsetLiftoff = _checkValues(altitudeOffsetLiftoffValues, altitudeOffsetLiftoff, _stateMachineSettings.altitudeOffsetLiftoff, sizeof(altitudeOffsetLiftoffValues) / sizeof(altitudeOffsetLiftoffValues[0]));
   _sampleRateAirborneAscent = _checkValues(sampleRateAirborneAscentValues, sampleRateAirborneAscent, _stateMachineSettings.sampleRates.airborneAscent, sizeof(sampleRateAirborneAscentValues) / sizeof(sampleRateAirborneAscentValues[0]));
   _sampleRateAirborneDescent = _checkValues(sampleRateAirborneDecentValues, sampleRateAirborneDecent, _stateMachineSettings.sampleRates.airborneDescent, sizeof(sampleRateAirborneDecentValues) / sizeof(sampleRateAirborneDecentValues[0]));
   _sampleRateGround = _checkValues(sampleRateGroundValues, sampleRateGround, _stateMachineSettings.sampleRates.ground, sizeof(sampleRateGroundValues) / sizeof(sampleRateGroundValues[0]));
 
+#ifdef DEBUG
   debug();
   debug();
   debug();
@@ -913,6 +916,7 @@ void stateMachine::save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent,
   debug();
   debug();
   debug();
+#endif
   
 #ifdef DEBUG
   Serial.println(F("\t\t...state machine... save checked"));
@@ -926,7 +930,6 @@ void stateMachine::save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent,
   Serial.println(_sampleRateGround);
   Serial.print(F("\t\t_sampleRateGround="));
   Serial.println(_sampleRateGround);
-#endif
 
   debug();
   debug();
@@ -937,6 +940,7 @@ void stateMachine::save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent,
   debug();
   debug();
   debug();
+#endif
 
   if (_settingsSaveFunc != nullptr)
     _settingsSaveFunc(_stateMachineSettings);
@@ -950,6 +954,7 @@ void stateMachine::save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent,
   // preferences.end();
 #endif
 
+#ifdef DEBUG
   debug();
   debug();
   debug();
@@ -959,6 +964,7 @@ void stateMachine::save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent,
   debug();
   debug();
   debug();
+#endif
 
   _altitudeOffsetGround = _altitudeOffsetLiftoff / 2;
 
@@ -968,6 +974,7 @@ void stateMachine::save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent,
   Serial.println();
 #endif
 
+#ifdef DEBUG
   debug();
   debug();
   debug();
@@ -977,6 +984,7 @@ void stateMachine::save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent,
   debug();
   debug();
   debug();
+#endif
 
   Serial.println(F("\t...state machine save successful."));
 }
@@ -1038,6 +1046,8 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
   _stateMachineSettings.sampleMeasures.aborted = SAMPLE_MEASURES_ABORTED;
   _stateMachineSettings.sampleMeasures.apogee = SAMPLE_MEASURES_APOGEE;
   _stateMachineSettings.sampleMeasures.landed = SAMPLE_MEASURES_LANDED;
+  
+#ifdef DEBUG
   debug();
   debug();
   debug();
@@ -1045,6 +1055,7 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
   debug();
   debug();
   debug();
+#endif
 
   _altitudeOffsetLiftoff = _stateMachineSettings.altitudeOffsetLiftoff;
   _sampleRateAirborneAscent = _stateMachineSettings.sampleRates.airborneAscent;
@@ -1052,6 +1063,8 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
   _sampleRateGround = _stateMachineSettings.sampleRates.ground;
 
   _flightLog->measures = _stateMachineSettings.sampleMeasures.apogee;
+  
+#ifdef DEBUG
   debug();
   debug();
   debug();
@@ -1059,6 +1072,7 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
   debug();
   debug();
   debug();
+#endif
 
   _altitudeOffsetGround = _altitudeOffsetLiftoff / 2;
 
@@ -1066,6 +1080,7 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
   _displaySettings();
   Serial.println();
 
+#ifdef DEBUG
   debug();
   debug();
   debug();
@@ -1074,9 +1089,11 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
   debug();
   debug();
   debug();
+#endif
 
   save(_altitudeOffsetLiftoff, _sampleRateAirborneAscent, _sampleRateAirborneDescent, _sampleRateGround);
 
+#ifdef DEBUG
   debug();
   debug();
   debug();
@@ -1085,6 +1102,7 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
   debug();
   debug();
   debug();
+#endif
 
   Serial.println(F("...state machine setup successful."));
   Serial.println();
