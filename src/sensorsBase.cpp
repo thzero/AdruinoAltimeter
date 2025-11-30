@@ -4,8 +4,18 @@
 #include <sensorsBase.h>
 
 sensorValuesStruct sensorsBase::initialize(float verticalTolerance) {
+  Serial.println(F("\t\tInitialize atmospheric sensors..."));
+
   sensorValuesStruct data = _atmosphereSensor->initialize();
+
+  Serial.println(F("\t\t...atmospheric sensors initialized!"));
+
+  Serial.println(F("\t\tInitialize IMU sensors..."));
+
   sensorValuesStruct data2 = _imuSensor->initialize();
+
+  Serial.println(F("\t\t...IMU sensors initialized!"));
+
   _imuSensor->setVerticalTolerance(verticalTolerance);
   data.acceleration = data2.acceleration;
   data.gyroscope = data2.gyroscope;
@@ -60,8 +70,6 @@ void sensorsBase::read(sensorValuesStruct* data, unsigned long current, unsigned
     return;
 
   readAtmosphere(data, current, delta);
-  // readAccelerometer(data);
-  // readGyroscope(data);
   readImu(data, current, delta);
 
   integrateVelocity(data, current, delta);
