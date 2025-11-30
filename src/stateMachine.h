@@ -31,28 +31,27 @@ typedef void (*StateMachinePreferenceSaveFunctionPtr)(settingStateMachineStruct&
 class stateMachine {
   public:
     stateMachine();
-    void loop(unsigned long timestamp, unsigned long delta);
-    void reset();
-    void save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent, int sampleRateAirborneDecent, int sampleRateGround);
-    byte setup(flightLog* flightLog, sensors* sensors, StateMachineStateFunctionPtr stateFunc = nullptr, StateMachineStateThottledFunctionPtr stateThrottledFunc = nullptr, StateMachineStateChangedFunctionPtr stateChangedFunc = nullptr, StateMachinePreferenceLoadFunctionPtr stateLoadFunc = nullptr, StateMachinePreferenceSaveFunctionPtr stateSaveFunc = nullptr);
-    flightStates state();
-    const char * stateName();
-
     int altitudeOffsetGround();
     int altitudeOffsetLiftoff();
     int altitudeInitial();
-    // void initializeSensors();
+    void initializeSensors();
+    void loop(unsigned long timestamp, unsigned long delta);
     void preferencesOutput();
     accelerometerValues readSensorAccelerometer();
     float readSensorAltitude();
     atmosphereValues readSensorAtmosphere();
     gyroscopeValues readSensorGyroscope();
     magnetometerValues readSensorMagnetometer();
+    void reset();
     void returnToGround();
     int sampleRateAirborneAscent();
     int sampleRateAirborneDescent();
     int sampleRateGround();
-
+    void save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent, int sampleRateAirborneDecent, int sampleRateGround);
+    byte setup(flightLog* flightLog, sensors* sensors, StateMachineStateFunctionPtr stateFunc = nullptr, StateMachineStateThottledFunctionPtr stateThrottledFunc = nullptr, StateMachineStateChangedFunctionPtr stateChangedFunc = nullptr, StateMachinePreferenceLoadFunctionPtr stateLoadFunc = nullptr, StateMachinePreferenceSaveFunctionPtr stateSaveFunc = nullptr);
+    flightStates state();
+    const char * stateName();
+    
     sensorValuesStruct sensorData;
 
     int altitudeOffsetLiftoffValues[10] = { 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 };

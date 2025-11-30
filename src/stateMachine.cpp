@@ -28,32 +28,32 @@ int stateMachine::altitudeOffsetLiftoff() {
   return _altitudeOffsetLiftoff;
 }
 
-// void stateMachine::initializeSensors() {
-//   // 20 degrees it the max deflection allowed by safety codes
-//   Serial.println(F("\t\tinitializeSensors...initialize begin"));
-//   sensorValuesStruct sensorValues = _sensors->initialize(20.0);
-//   Serial.println(F("\t\tinitializeSensors...initialize end"));
+void stateMachine::initializeSensors() {
+  // 20 degrees it the max deflection allowed by safety codes
+  Serial.println(F("\t\tinitializeSensors...initialize begin"));
+  sensorValuesStruct sensorValues = _sensors->initialize(20.0);
+  Serial.println(F("\t\tinitializeSensors...initialize end"));
   
-//   Serial.println(F("\t\tinitializeSensors...getdata"));
-//   Serial.print(F("\t\tinitializeSensors..._flightLog: "));
-//   Serial.println(_flightLog == nullptr ? "null": "good");
-//   sensorData.atmosphere.humidity = _flightLog->humidityInitial = sensorValues.atmosphere.humidity;
-//   sensorData.atmosphere.pressure = _flightLog->pressureInitial = sensorValues.atmosphere.pressure;
-//   sensorData.atmosphere.temperature = _flightLog->temperatureInitial = sensorValues.atmosphere.temperature;
-//   sensorData.atmosphere.altitude = _flightLog->altitudeInitial = sensorValues.atmosphere.altitude;
+  Serial.println(F("\t\tinitializeSensors...getdata"));
+  Serial.print(F("\t\tinitializeSensors..._flightLog: "));
+  Serial.println(_flightLog == nullptr ? "null": "good");
+  sensorData.atmosphere.humidity = _flightLog->humidityInitial = sensorValues.atmosphere.humidity;
+  sensorData.atmosphere.pressure = _flightLog->pressureInitial = sensorValues.atmosphere.pressure;
+  sensorData.atmosphere.temperature = _flightLog->temperatureInitial = sensorValues.atmosphere.temperature;
+  sensorData.atmosphere.altitude = _flightLog->altitudeInitial = sensorValues.atmosphere.altitude;
 
-//   sensorData.acceleration.x = sensorValues.acceleration.x;
-//   sensorData.acceleration.y = sensorValues.acceleration.y;
-//   sensorData.acceleration.z = sensorValues.acceleration.z;
+  sensorData.acceleration.x = sensorValues.acceleration.x;
+  sensorData.acceleration.y = sensorValues.acceleration.y;
+  sensorData.acceleration.z = sensorValues.acceleration.z;
 
-//   sensorData.gyroscope.x = sensorValues.gyroscope.x;
-//   sensorData.gyroscope.y = sensorValues.gyroscope.y;
-//   sensorData.gyroscope.z = sensorValues.gyroscope.z;
+  sensorData.gyroscope.x = sensorValues.gyroscope.x;
+  sensorData.gyroscope.y = sensorValues.gyroscope.y;
+  sensorData.gyroscope.z = sensorValues.gyroscope.z;
   
-//   sensorData.magnetometer.x = sensorValues.magnetometer.x;
-//   sensorData.magnetometer.y = sensorValues.magnetometer.y;
-//   sensorData.magnetometer.z = sensorValues.magnetometer.z;
-// }
+  sensorData.magnetometer.x = sensorValues.magnetometer.x;
+  sensorData.magnetometer.y = sensorValues.magnetometer.y;
+  sensorData.magnetometer.z = sensorValues.magnetometer.z;
+}
 
 void stateMachine::loop(unsigned long timestamp, unsigned long delta) {
   // Simple state machine for the flight...

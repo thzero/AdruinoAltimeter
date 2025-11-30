@@ -13,9 +13,10 @@ class sensors: public sensorsBase {
     int8_t initOverride(SensorOverrideFunctionPtr atmosphereFuncOverride = nullptr, SensorOverrideFunctionPtr imuFuncOverride = nullptr);
     void calibrationResetCommand(uint8_t* commandBuffer, uint16_t commandBufferLength) override;
     void readAccelerometer(sensorValuesStruct* data) override;
+    void readAtmosphere(sensorValuesStruct* data, unsigned long current, unsigned long delta) override;
     void readAtmosphere(sensorValuesStruct* data) override;
     void readGps(sensorValuesStruct* data) override;
-    // void readImu(sensorValuesStruct* data, unsigned long current, unsigned long delta) override;
+    void readImu(sensorValuesStruct* data, unsigned long current, unsigned long delta) override;
     void readMagnetometer(sensorValuesStruct* data) override;
     void readGyroscope(sensorValuesStruct* data) override;
 };
