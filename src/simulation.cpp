@@ -2,10 +2,9 @@
 #include <ArduinoJson.h>
 
 #include <debug.h>
-#include <simulation.h>
 #include <utilities.h>
 
-// #include "constants.h"
+#include "simulation.h"
 
 // https://rocketmime.com/rockets/rckt_sim.html#Drag
 
@@ -18,20 +17,20 @@ bool simulation::isRunning() {
   return _running;
 }
 
-void simulation::evaluateTimestep(unsigned long deltaT, double drag, double Mr, double Ft) {
+void simulation::evaluateTimestep(unsigned long deltaT, float drag, float Mr, float Ft) {
   // TODO: Introduce some  point - recommendation seems to be to use Simplex noise from FastLED
   // Leap-frog Euler method -- interleave calculation of DeltaX, DeltaV
   // Serial.print(F("G: "));
   // Serial.printf("%f\n", GravConstant);
   // Serial.print(F("Mr: "));
   // Serial.println(Mr);
-  // Serial.print(F("_altitude: "));
-  // Serial.println(_altitude);
+  // Serial.print(F("_altitudeCurrent: "));
+  // Serial.println(_altitudeCurrent);
 
   // Compute the total force
-  // double F = (-1 * GravConstant) * EarthRadius * Mr / pow(_altitude, 2);  // this is tyring to get change gravity based on radius from center of earth
+  // float F = (-1 * GravConstant) * EarthRadius * Mr / pow(_altitudeCurrent, 2);  // this is tyring to get change gravity based on radius from center of earth
   // Fd = .5 V^2 drag, drag = (rho Cd A)
-  double dragSign = (_velocity < 0) ? 1.0 : -1.0;
+  float dragSign = (_velocity < 0) ? 1.0 : -1.0;
   // Serial.print(F("dragSign: "));
   // Serial.println(dragSign);
   _forceDrag = 0.5 * pow(_velocity, 2) * drag * dragSign;
@@ -39,7 +38,7 @@ void simulation::evaluateTimestep(unsigned long deltaT, double drag, double Mr, 
   // Serial.println(_forceDrag);
 
   // F = Ft-Fd-M*g is the sum of thrust, drag, and weight
-  // double F = Ft - Fd - (Mr * GravConstant);
+  // float F = Ft - Fd - (Mr * GravConstant);
   _forceGravity = (Mr * GravConstant);
   // Serial.print(F("_forceGravity: "));
   // Serial.println(_forceGravity);
@@ -48,7 +47,7 @@ void simulation::evaluateTimestep(unsigned long deltaT, double drag, double Mr, 
   // Serial.print(F("_forceGravity: "));
   // Serial.println(_forceGravity);
 
-  double deltaF = deltaT / 1000.0 / 1000.0;
+  float deltaF = deltaT / 1000.0 / 1000.0;
   // Serial.print(F("deltaF: "));
   // Serial.println(deltaF);
 
@@ -69,18 +68,19 @@ void simulation::evaluateTimestep(unsigned long deltaT, double drag, double Mr, 
     // Serial.println(_velocity);
 
   // Move the position
-  _altitude += deltaF * _velocity;
-    // Serial.print(F("_altitude: "));
-    // Serial.println(_altitude);
+  _altitudeCurrent += deltaF * _velocity;
+    // Serial.print(F("_altitudeCurrent: "));
+    // Serial.println(_altitudeCurrent);
 }
 
 void simulation::loopStep(unsigned long deltaT, bool output, bool outputHeader) {
   // Altitude is the flight altitude minus starting altitude.
-  double altitudeFlight = _altitude - _altitudeStarting;
-  double airDensity = AirDensity * pow(0.5, altitudeFlight / AirDensityScale);
+  // float altitudeFlight = _altitudeCurrent - _altitudeInitial;
+  float altitudeFlight = _altitudeCurrent;
+  float airDensity = AirDensity * pow(0.5, altitudeFlight / AirDensityScale);
 
-  double mass = _config.mass;
-  double thrust = 0;
+  float mass = _config.mass;
+  float thrust = 0;
   bool burnout = (_elapsedTime >= _burnoutTime);
   if (!burnout) {
     mass = _config.mass + _config.motorFuelMass - _config.motorFuelBurnRateMicro * _elapsedTime;
@@ -91,7 +91,7 @@ void simulation::loopStep(unsigned long deltaT, bool output, bool outputHeader) 
   // rho = air density
   // Cd = drag coefficient
   // A = Frontal Area
-  double drag = airDensity * _config.frontalArea * _config.cd;
+  float drag = airDensity * _config.frontalArea * _config.cd;
   if (_airborneApogee)
     // calculate parachute drag...
     drag = airDensity * _config.parachuteArea * _config.parachuteCd;
@@ -110,7 +110,7 @@ void simulation::loopStep(unsigned long deltaT, bool output, bool outputHeader) 
       _status = simulationStatusAirborneAscent;
   }
   else if (_status == simulationStatusAirborneAscent) {
-    double altitudeFlightDelta = altitudeFlight - _altitudeFlightLast;
+    float altitudeFlightDelta = altitudeFlight - _altitudeFlightLast;
     // Detect apogee by taking X number of measures as long as the current is less
     // than the last recorded altitude.
 #ifdef DEBUG_SIM
@@ -191,115 +191,122 @@ void simulation::loopStep(unsigned long deltaT, bool output, bool outputHeader) 
   _elapsedTime += deltaT;
 }
 
-void simulation::outputPrint(unsigned long delta, double mass, double thrust, double altitude, double airDensity, double drag, bool burnout, double apogeeDelta) {
-  char temp[20];
-  char formatFloat[5] = "%.4f";
-  char formatInt[16] = "%d";
-  Serial.print(F("sim -  "));
+void simulation::outputPrint(unsigned long delta, float mass, float thrust, float altitude, float airDensity, float drag, bool burnout, float apogeeDelta) {
+  Serial.print("sim -  _elapsedTime: ");
+  Serial.println(_elapsedTime);
+  Serial.print("sim -  altitude: ");
+  Serial.println(altitude);
+  Serial.print("sim -  thrust: ");
+  Serial.println(thrust);
 
-  sprintf(temp, formatInt, _elapsedTime);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 16));
+  // char temp[50];
+  // char formatFloat[5] = "%.4f";
+  // char formatInt[16] = "%d";
+  // Serial.print(F("sim -  "));
 
-  sprintf(temp, formatInt, delta);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 11));
+  // sprintf(temp, formatInt, _elapsedTime);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 16));
 
-  const char* resultsB = burnout ? "true" : "false";
-  Serial.print(resultsB);
-  Serial.print(stringPad(resultsB, 10));
+  // sprintf(temp, formatInt, delta);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 11));
 
-  sprintf(temp, formatInt, _burnoutTime);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 11));
+  // const char* resultsB = burnout ? "true" : "false";
+  // Serial.print(resultsB);
+  // Serial.print(stringPad(resultsB, 10));
 
-  const char* resultsA = _status == simulationStatusAirborneAscent ? "Ascent" : _status == simulationStatusAirborneDescent ? "Descent" : _status == simulationStatusLanded ? "Landed" : "Ground";
-  Serial.print(resultsA);
-  Serial.print(stringPad(resultsA, 10));
+  // sprintf(temp, formatInt, _burnoutTime);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 11));
 
-  sprintf(temp, formatFloat, _config.mass);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 11));
+  // const char* resultsA = _status == simulationStatusAirborneAscent ? "Ascent" : _status == simulationStatusAirborneDescent ? "Descent" : _status == simulationStatusLanded ? "Landed" : "Ground";
+  // Serial.print(resultsA);
+  // Serial.print(stringPad(resultsA, 10));
 
-  sprintf(temp, formatFloat, _config.mass + _config.motorFuelMass);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 10));
+  // sprintf(temp, formatFloat, _config.mass);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 11));
 
-  sprintf(temp, formatFloat, mass);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 12));
+  // sprintf(temp, formatFloat, _config.mass + _config.motorFuelMass);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 10));
 
-  sprintf(temp, formatFloat, thrust);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 13));
+  // sprintf(temp, formatFloat, mass);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 12));
 
-  sprintf(temp, formatFloat, _forceDrag);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 13));
+  // sprintf(temp, formatFloat, thrust);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 13));
 
-  sprintf(temp, formatFloat, _forceGravity);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 13));
+  // sprintf(temp, formatFloat, _forceDrag);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 13));
 
-  sprintf(temp, formatFloat, _forceTotal);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 13));
+  // sprintf(temp, formatFloat, _forceGravity);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 13));
 
-  sprintf(temp, formatFloat, _acceleration); // Acceleration
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 15));
+  // sprintf(temp, formatFloat, _forceTotal);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 13));
 
-  sprintf(temp, formatFloat, _velocity); // Velocity
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 14));
+  // sprintf(temp, formatFloat, _acceleration); // Acceleration
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 15));
 
-  sprintf(temp, formatFloat, altitude);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 14));
+  // sprintf(temp, formatFloat, _velocity); // Velocity
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 14));
 
-  sprintf(temp, formatFloat, _altitudeStarting);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 14));
+  // sprintf(temp, formatFloat, altitude);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 14));
 
-  sprintf(temp, formatFloat, airDensity);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 14));
+  // sprintf(temp, formatFloat, _altitudeInitial);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 14));
 
-  sprintf(temp, formatFloat, drag);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 10));
+  // sprintf(temp, formatFloat, airDensity);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 14));
 
-  sprintf(temp, formatFloat, _config.frontalArea);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 16));
+  // sprintf(temp, formatFloat, drag);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 10));
 
-  sprintf(temp, formatFloat, _config.cd);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 10));
+  // sprintf(temp, formatFloat, _config.frontalArea);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 16));
 
-  sprintf(temp, formatFloat, _config.parachuteArea);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 16));
+  // sprintf(temp, formatFloat, _config.cd);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 10));
 
-  sprintf(temp, formatFloat, _config.parachuteCd);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 10));
+  // sprintf(temp, formatFloat, _config.parachuteArea);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 16));
 
-  sprintf(temp, "%.2f", _altitudeApogeeMeasures);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 11));
+  // sprintf(temp, formatFloat, _config.parachuteCd);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 10));
 
-  sprintf(temp, formatFloat, apogeeDelta);
-  Serial.print(temp);
-  Serial.print(stringPad(temp, 14));
+  // sprintf(temp, "%.2f", _altitudeApogeeMeasures);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 11));
 
-  Serial.println(_airborneApogee ? "true" : "false");
+  // sprintf(temp, formatFloat, apogeeDelta);
+  // Serial.print(temp);
+  // Serial.print(stringPad(temp, 14));
+
+  // Serial.println(_airborneApogee ? "true" : "false");
 }
 
 void simulation::outputPrintHeader() {
-  Serial.println(F("sim -                           Burnout                     Mass                          Force                                                                      Altitude                                        Rocket                  Parachute               Apogee"));
-  Serial.println(F("sim -  Time           Delta     Burnout  Time      Status   Rocket    Total    Current    Thrust      Drag        Gravity     Total       Acceleration  Velocity     Flight       Initial      Air Density  Drag     Cross Section  Cd       Cross Section  Cd       Measures  Delta        Apogee"));
-  Serial.println(F("sim -                           ----------------            ----------------------------  -----------------------------------------------                            -------------------------                       ----------------------- ----------------------- -----------------------------"));
+  // Serial.println(F("sim -                           Burnout                     Mass                          Force                                                                      Altitude                                        Rocket                  Parachute               Apogee"));
+  // Serial.println(F("sim -  Time           Delta     Burnout  Time      Status   Rocket    Total    Current    Thrust      Drag        Gravity     Total       Acceleration  Velocity     Flight       Initial      Air Density  Drag     Cross Section  Cd       Cross Section  Cd       Measures  Delta        Apogee"));
+  // Serial.println(F("sim -                           ----------------            ----------------------------  -----------------------------------------------                            -------------------------                       ----------------------- ----------------------- -----------------------------"));
 }
 
 void simulation::outputSerialList() {
@@ -372,6 +379,65 @@ void simulation::outputSerialList() {
   Serial.println(F("...completed"));
 }
 
+accelerometerValues simulation::readAcceleration() {
+  accelerometerValues values;
+  if (!_running)
+    return values;
+
+  values.x = 0;
+  values.y = 0;
+  values.z = _acceleration;
+
+  return values;
+}
+
+float simulation::readAltitude() {
+  if (!_running)
+    return 0;
+
+#if defined(DEBUG_SIM) || defined(DEBUG_SIM_OUTPUT)
+  debug("simulation.altitude", _altitude);
+#endif
+  return _altitudeCurrent;
+}
+
+atmosphereValues simulation::readAtmosphere() {
+  atmosphereValues values;
+  if (!_running)
+    return values;
+
+  values.altitude = _altitudeCurrent;
+  values.humidity = 0;
+  values.pressure = 0;
+  values.temperature = 0;
+
+  return values;
+}
+
+gyroscopeValues simulation::readGyroscope() {
+  gyroscopeValues values;
+  if (!_running)
+    return values;
+
+  values.x = 0;
+  values.y = 0;
+  values.z = 0;
+
+  return values;
+}
+
+magnetometerValues simulation::readMagnetometer() {
+  magnetometerValues values;
+  if (!_running)
+    return values;
+
+  values.x = 0;
+  values.y = 0;
+  values.z = 0;
+
+  return values;
+}
+
 void simulation::simulationTask() {
   if (!_running)
     return;
@@ -438,6 +504,7 @@ void simulation::simulationTaskStart() {
   _start = _simulationTimestamp = micros();
 }
 
+#if defined(EPS32)
 void simulation::simulationTaskWrapper() {
   Serial.println(F("Simulation task..."));
   Serial.print(F("sim -  Sample Rate="));
@@ -448,6 +515,7 @@ void simulation::simulationTaskWrapper() {
     simulationTask();
   simulationTaskEnd();
 }
+#endif
 
 int8_t simulation::setup(JsonDocument configs) {
   Serial.println(F("Setup simulation...."));
@@ -460,7 +528,7 @@ int8_t simulation::setup(JsonDocument configs) {
   return 0;
 }
 
-void simulation::start(int requestedNumber, long altitudeInitial, long altitudeFinal) {
+void simulation::start(int requestedNumber, float altitudeInitial, float altitudeFinal) {
   Serial.println();
   Serial.println(F("Simulation Started"));
 
@@ -560,7 +628,7 @@ void simulation::start(int requestedNumber, long altitudeInitial, long altitudeF
   Serial.println(startConfig.diameterMM, 5);
   Serial.print("Diameter: ");
   Serial.println(startConfig.diameter, 5);
-  Serial.print("dragCoefficient: ");
+  Serial.print("DragCoefficient: ");
   Serial.println(startConfig.cd, 5);
   Serial.print("FrontalArea: ");
   Serial.println(startConfig.frontalArea, 5);
@@ -587,7 +655,12 @@ void simulation::start(int requestedNumber, long altitudeInitial, long altitudeF
   _status = simulationStatusGround;
   _acceleration = 0.0; // acceleration
   _airborneApogee = false;
-  _altitude = _altitudeStarting; // initial position
+  _altitudeApogee = -1;
+  _altitudeApogeeMeasures = SAMPLE_MEASURES_APOGEE;
+  _altitudeCurrent = altitudeInitial; // initial position
+  _altitudeEnding = altitudeFinal;
+  _altitudeInitial = altitudeInitial;
+  _altitudeFlightLast = 0;
   _burnoutTime = _config.motorFuelBurnTime * 1000 * 1000;
   _count = 0;
   _countHeader = 0;
@@ -595,15 +668,19 @@ void simulation::start(int requestedNumber, long altitudeInitial, long altitudeF
   _maxAltitude = 0;
   _maxVelocity = 0;
   _motorThrust = _config.motorThrust; // N
-  _altitudeApogee = -1;
-  _altitudeApogeeMeasures = SAMPLE_MEASURES_APOGEE;
-  _altitudeEnding = altitudeFinal;
-  _altitudeInitial = altitudeInitial;
-  _altitudeFlightLast = 0;
-  _altitudeStarting = altitudeInitial;
   _settle = 0;
   _settleFinal = 0;
   _velocity = 0.0; // velocity
+
+  Serial.print("altitudeInitial: ");
+  Serial.println(altitudeInitial, 5);
+  Serial.print("_altitudeCurrent: ");
+  Serial.println(_altitudeCurrent, 5);
+  Serial.print("_altitudeInitial: ");
+  Serial.println(_altitudeInitial, 5);
+  Serial.print("_altitudeEnding: ");
+  Serial.println(_altitudeEnding, 5);
+  Serial.println();
   
   _running = true;
 
@@ -623,31 +700,6 @@ void simulation::stop() {
   }
   Serial.println(F("Simulation\tNo simulation was running."));
   Serial.println();
-}
-
-double simulation::valueAltitude() {
-  if (!_running)
-    return 0;
-
-  // Trace has the Earth Radius and Starting Altitude built into it.
-  // Sensors only account for AGL so removing the EarthRadius.
-  double altitude = _altitude - EarthRadius;
-#if defined(DEBUG_SIM) || defined(DEBUG_SIM_OUTPUT)
-  debug("simulation.altitude", altitude);
-#endif
-  return altitude;
-}
-
-accelerometerValues simulation::valueAcceleration() {
-  accelerometerValues values;
-  if (!_running)
-    return values;
-
-  values.x = 0;
-  values.y = 0;
-  values.z = _acceleration;
-
-  return values;
 }
 
 simulation _simulation;

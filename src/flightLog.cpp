@@ -15,6 +15,10 @@ void flightLog::init(unsigned long timestamp) {
   _instance->init(timestamp);
 }
 
+flightLoggerBase* flightLog::instance() {
+  return _instance;
+}
+
 void flightLog::reset() {
   // Reset the flight...
   aborted = false;

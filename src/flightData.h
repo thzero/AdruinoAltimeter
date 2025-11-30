@@ -37,6 +37,9 @@ struct flightDataTraceStruct {
   float gyroX;
   float gyroY;
   float gyroZ;
+  float magnetometerX;
+  float magnetometerY;
+  float magnetometerZ;
   float humidity;
   float pressure;
   float temperature;
@@ -103,6 +106,13 @@ struct __attribute__((packed)) flightDataGyroscopeValues {
   float z;
 };
 
+struct __attribute__((packed)) flightDataImuValues {
+  float roll;
+  float pitch;
+  float yaw;
+  bool vertical;
+};
+
 struct __attribute__((packed)) flightDataMagnetometerValues {
   float x;
   float y;
@@ -122,6 +132,7 @@ struct __attribute__((packed)) flightDataTraceStruct2 {
   flightDataAtmosphereValues atmosphere;
   flightDataGPSValues gps;
   flightDataGyroscopeValues gyroscope;
+  flightDataImuValues imu;
   flightDataMagnetometerValues magnetometer;
   flightDataVelocityValues velocity;
 };

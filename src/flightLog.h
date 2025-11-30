@@ -10,6 +10,7 @@ class flightLog {
   public:
     flightLog();
     void init(unsigned long timestamp);
+    flightLoggerBase* instance();
     void reset();
     byte setup(flightLoggerBase* instance, deviceCommands* deviceCommands);
     
@@ -20,7 +21,7 @@ class flightLog {
     flightDataTraceStruct2 current2;
     float humidityInitial;
     // Number of measures to do so that we are sure that apogee has been reached
-    unsigned long measures = 5;
+    unsigned int measures = 5;
     float pressureInitial;
     bool recording;
     float temperatureInitial;

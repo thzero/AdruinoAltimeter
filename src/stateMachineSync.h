@@ -18,22 +18,22 @@ class stateMachineSync {
     flightStates state();
     const char * stateName();
 
-    int altitudeLiftoff();
+    int altitudeOffsetLiftoff();
     int sampleRateAirborneAscent();
     int sampleRateAirborneDescent();
     int sampleRateGround();
-    void setAltitudeLiftoff(int altitudeLiftoff);
+    void setAltitudeOffsetLiftoff(int altitudeOffsetLiftoff);
     void setSampleRateAirborneAscent(int altitudeAirborneDescent);
     void setSampleRateAirborneDescent(int altitudeAirborneDescent);
     void setSampleRateGround(int altitudeGround);
 
-    int altitudeLiftoffValues[12] = { 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60 };
+    int altitudeOffsetLiftoffValues[12] = { 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60 };
     int sampleRateAirborneAscentValues[10] = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60 };
     int sampleRateAirborneDecentValues[12] = { 1, 2, 3, 4, 5, 6, 8, 10, 15, 20, 25, 30 };
     int sampleRateGroundValues[12] = { 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60 };
     
   private:
-    int _altitudeLiftoff = 0;
+    int _altitudeOffsetLiftoff = 0;
     int _altitudeGround = 0;
     flightStates _loopState = FLIGHT_STATE_GROUND;
     StateMachineStateFunctionPtr _loopStatedFunc;

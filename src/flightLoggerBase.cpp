@@ -360,7 +360,7 @@ bool flightLoggerBase::outputSerialList() {
 
 #if defined(DEBUG) && defined(DEBUG_FLIGHT_LOGGER)
   serializeJson(flightLogs, Serial);
-  Serial.println(F(""));
+  Serial.println();
 #endif
   
   Serial.println(F("$start;"));
@@ -469,6 +469,18 @@ void flightLoggerBase::setTraceCurrentGyroZ(float z) {
 
 void flightLoggerBase::setTraceCurrentHumidity(float humidity) {
   _flightDataTraceCurrent.humidity = humidity;
+}
+
+void flightLoggerBase::setTraceCurrentMagnetometerX(float x) {
+  _flightDataTraceCurrent.magnetometerX = x;
+}
+
+void flightLoggerBase::setTraceCurrentMagnetometerY(float y) {
+  _flightDataTraceCurrent.magnetometerY = y;
+}
+
+void flightLoggerBase::setTraceCurrentMagnetometerZ(float z) {
+  _flightDataTraceCurrent.magnetometerZ = z;
 }
 
 void flightLoggerBase::setTraceCurrentPressure(float pressure) {

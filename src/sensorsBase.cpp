@@ -3,9 +3,10 @@
 
 #include <sensorsBase.h>
 
-sensorValuesStruct sensorsBase::initialize() {
+sensorValuesStruct sensorsBase::initialize(float verticalTolerance) {
   sensorValuesStruct data = _atmosphereSensor->initialize();
   sensorValuesStruct data2 = _imuSensor->initialize();
+  _imuSensor->setVerticalTolerance(verticalTolerance);
   data.acceleration = data2.acceleration;
   data.gyroscope = data2.gyroscope;
   return data;
@@ -14,6 +15,7 @@ sensorValuesStruct sensorsBase::initialize() {
 int8_t sensorsBase::initOverride(SensorOverrideFunctionPtr atmosphereFuncOverride, SensorOverrideFunctionPtr imuFuncOverride) {
   _atmosphereSensor->initOverride(atmosphereFuncOverride);
   _imuSensor->initOverride(imuFuncOverride);
+  return 0;
 }
 
 void sensorsBase::integrateVelocity(sensorValuesStruct* data, unsigned long current, unsigned long delta) {
@@ -51,6 +53,18 @@ void sensorsBase::integrateVelocity(sensorValuesStruct* data, unsigned long curr
   data->velocity.x = velocityX;
   data->velocity.y = velocityY;
   data->velocity.z = velocityZ;
+}
+
+void sensorsBase::read(sensorValuesStruct* data, unsigned long current, unsigned long delta) {
+  if (data == nullptr)
+    return;
+
+  readAtmosphere(data, current, delta);
+  // readAccelerometer(data);
+  // readGyroscope(data);
+  readImu(data, current, delta);
+
+  integrateVelocity(data, current, delta);
 }
 
 float sensorsBase::readAltitude() {
