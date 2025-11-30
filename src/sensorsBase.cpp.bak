@@ -60,6 +60,8 @@ void sensorsBase::read(sensorValuesStruct* data, unsigned long current, unsigned
     return;
 
   readAtmosphere(data, current, delta);
+  // readAccelerometer(data);
+  // readGyroscope(data);
   readImu(data, current, delta);
 
   integrateVelocity(data, current, delta);
