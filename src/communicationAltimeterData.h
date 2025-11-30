@@ -20,6 +20,7 @@ struct __attribute__((packed)) communicationInternalStruct {
   flightDataAtmosphereValues atmosphere;
   flightDataGPSValues gps;
   flightDataGyroscopeValues gyroscope;
+  flightDataImuValues imu;
   flightDataMagnetometerValues magnetometer;
   communicationMonitorDataStruct monitor;
   settingsStruct settings;

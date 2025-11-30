@@ -29,6 +29,7 @@ class sensorsBase {
     virtual void readAtmosphere(sensorValuesStruct* data);
     virtual void readGps(sensorValuesStruct* data);
     virtual void readGyroscope(sensorValuesStruct* data);
+    virtual void readMagnetometer(sensorValuesStruct* data);
     virtual void sleep();
     virtual sensorsSetupResults setup(sensorBarometer* atmosphereSensor, sensorIMU* imuSensor, sensorGPS* gps, uint8_t calibrationBarometerId = 0, uint8_t calibrationBarometerStatusId = 0, uint8_t calibrationIMUId = 0, uint8_t calibrationIMUStatusId = 0);
     virtual void setupCompleted();

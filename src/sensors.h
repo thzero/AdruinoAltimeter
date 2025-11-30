@@ -15,6 +15,8 @@ class sensors: public sensorsBase {
     void readAccelerometer(sensorValuesStruct* data) override;
     void readAtmosphere(sensorValuesStruct* data) override;
     void readGps(sensorValuesStruct* data) override;
+    // void readImu(sensorValuesStruct* data, unsigned long current, unsigned long delta) override;
+    void readMagnetometer(sensorValuesStruct* data) override;
     void readGyroscope(sensorValuesStruct* data) override;
 };
 

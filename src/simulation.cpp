@@ -379,6 +379,65 @@ void simulation::outputSerialList() {
   Serial.println(F("...completed"));
 }
 
+accelerometerValues simulation::readAcceleration() {
+  accelerometerValues values;
+  if (!_running)
+    return values;
+
+  values.x = 0;
+  values.y = 0;
+  values.z = _acceleration;
+
+  return values;
+}
+
+float simulation::readAltitude() {
+  if (!_running)
+    return 0;
+
+#if defined(DEBUG_SIM) || defined(DEBUG_SIM_OUTPUT)
+  debug("simulation.altitude", _altitude);
+#endif
+  return _altitudeCurrent;
+}
+
+atmosphereValues simulation::readAtmosphere() {
+  atmosphereValues values;
+  if (!_running)
+    return values;
+
+  values.altitude = _altitudeCurrent;
+  values.humidity = 0;
+  values.pressure = 0;
+  values.temperature = 0;
+
+  return values;
+}
+
+gyroscopeValues simulation::readGyroscope() {
+  gyroscopeValues values;
+  if (!_running)
+    return values;
+
+  values.x = 0;
+  values.y = 0;
+  values.z = 0;
+
+  return values;
+}
+
+magnetometerValues simulation::readMagnetometer() {
+  magnetometerValues values;
+  if (!_running)
+    return values;
+
+  values.x = 0;
+  values.y = 0;
+  values.z = 0;
+
+  return values;
+}
+
 void simulation::simulationTask() {
   if (!_running)
     return;
@@ -641,40 +700,6 @@ void simulation::stop() {
   }
   Serial.println(F("Simulation\tNo simulation was running."));
   Serial.println();
-}
-
-float simulation::valueAltitude() {
-  if (!_running)
-    return 0;
-
-#if defined(DEBUG_SIM) || defined(DEBUG_SIM_OUTPUT)
-  debug("simulation.altitude", _altitude);
-#endif
-  return _altitudeCurrent;
-}
-
-accelerometerValues simulation::valueAcceleration() {
-  accelerometerValues values;
-  if (!_running)
-    return values;
-
-  values.x = 0;
-  values.y = 0;
-  values.z = _acceleration;
-
-  return values;
-}
-
-gyroscopeValues simulation::valueGyroscope() {
-  gyroscopeValues values;
-  if (!_running)
-    return values;
-
-  values.x = 0;
-  values.y = 0;
-  values.z = 0;
-
-  return values;
 }
 
 simulation _simulation;

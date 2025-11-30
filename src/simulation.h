@@ -43,6 +43,11 @@ class simulation {
     simulation();
     bool isRunning();
     void outputSerialList();
+    accelerometerValues readAcceleration();
+    float readAltitude();
+    atmosphereValues readAtmosphere();
+    gyroscopeValues readGyroscope();
+    magnetometerValues readMagnetometer();
     int8_t setup(JsonDocument settings);
     void simulationTask();
     void simulationTaskEnd();
@@ -52,9 +57,6 @@ class simulation {
 #endif
     void start(int requestedNumber, float altitudeInitial, float altitudeFinal);
     void stop();
-    accelerometerValues valueAcceleration();
-    gyroscopeValues valueGyroscope();
-    float valueAltitude();
 
   private:
     float AirDensity = 1.292;        // kg/m^3

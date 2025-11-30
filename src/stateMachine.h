@@ -2,10 +2,10 @@
 #define _STATE_MACHINE_H
 
 #include <buttonHandlerBase.h>
-#include <flightData.h>
-#include <flightLog.h>
 #include <loopThrottle.h>
 
+#include "flightData.h"
+#include "flightLog.h"
 #include "sensors.h"
 #include "settings.h"
 #include "stateMachineConstants.h"
@@ -22,16 +22,6 @@
 #define PREFERENCE_KEY_ALTITUDE_LIFTOFF "smAL"
 #define PREFERENCE_KEY_LAUNCH_DETECT "smLD"
 
-// struct stateMachineSettingsStruct {
-//     int altitudeLiftoff = ALTITUDE_LIFTOFF;
-//     settingsSampleMeasuresStruct sampleMeasures;
-//     settingsSampleRatesStruct sampleRates;
-//     // Assumed environmental values
-//     float altitudeBarometer = 1650.3;  // meters ... map readings + barometer position
-//     int timeoutRecording = 300 * 10000;
-//     int timeOutTimeToApogee = 20000;
-// };
-
 typedef void (*StateMachineStateFunctionPtr)(flightStates state, unsigned long timestamp, unsigned long deltaElapsed);
 typedef void (*StateMachineStateChangedFunctionPtr)(flightStates state, flightStates stateFrom, unsigned long timestamp, unsigned long deltaElapsed);
 typedef void (*StateMachineStateThottledFunctionPtr)(flightStates state, unsigned long timestamp, unsigned long deltaElapsed);
@@ -43,13 +33,21 @@ class stateMachine {
     stateMachine();
     void loop(unsigned long timestamp, unsigned long delta);
     void reset();
-    void save(int altitudeLiftoff, int sampleRateAirborneAscent, int sampleRateAirborneDecent, int sampleRateGround);
+    void save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent, int sampleRateAirborneDecent, int sampleRateGround);
     byte setup(flightLog* flightLog, sensors* sensors, StateMachineStateFunctionPtr stateFunc = nullptr, StateMachineStateThottledFunctionPtr stateThrottledFunc = nullptr, StateMachineStateChangedFunctionPtr stateChangedFunc = nullptr, StateMachinePreferenceLoadFunctionPtr stateLoadFunc = nullptr, StateMachinePreferenceSaveFunctionPtr stateSaveFunc = nullptr);
     flightStates state();
     const char * stateName();
 
-    int altitudeLiftoff();
+    int altitudeOffsetGround();
+    int altitudeOffsetLiftoff();
+    int altitudeInitial();
+    // void initializeSensors();
     void preferencesOutput();
+    accelerometerValues readSensorAccelerometer();
+    float readSensorAltitude();
+    atmosphereValues readSensorAtmosphere();
+    gyroscopeValues readSensorGyroscope();
+    magnetometerValues readSensorMagnetometer();
     void returnToGround();
     int sampleRateAirborneAscent();
     int sampleRateAirborneDescent();
@@ -57,7 +55,7 @@ class stateMachine {
 
     sensorValuesStruct sensorData;
 
-    int altitudeLiftoffValues[10] = { 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 };
+    int altitudeOffsetLiftoffValues[10] = { 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 };
     int sampleRateAirborneAscentValues[4] = { 15, 20, 25, 30 };
     int sampleRateAirborneDecentValues[8] = { 1, 2, 3, 4, 5, 6, 8, 10 };
     int sampleRateGroundValues[8] = { 5, 10, 15, 20, 25, 30, 35, 40 };
@@ -75,18 +73,13 @@ class stateMachine {
     void loopStateLANDEDToGROUND(unsigned long timestamp, unsigned long deltaElapsed);
     void loopStateGROUND(unsigned long timestamp, unsigned long deltaElapsedElapsed);
     void loopStateGROUNDToAIRBORNE_ASCENT(unsigned long timestamp, unsigned long deltaElapsed);
-    accelerometerValues readSensorAccelerometer();
-    float readSensorAltitude();
-    atmosphereValues readSensorAtmosphere();
-    gyroscopeValues readSensorGyroscope();
-    magnetometerValues readSensorMagnetometer();
     int _checkValues(int values[], int value, int defaultValue, int size);
     void _displaySettings();
     void _updateTrace(unsigned long currentTimestamp, long diffTime);
     void _updateTrace(unsigned long currentTimestamp, long diffTime, atmosphereValues atmosphereValuesO, float altitudeDelta);
 
-    int _altitudeLiftoff = 0;
-    int _altitudeGround = 0;
+    int _altitudeOffsetLiftoff = 0;
+    int _altitudeOffsetGround = 0;
     unsigned int _countdownAborted = 0;
     unsigned int _countdownLanded = 0;
     flightLog* _flightLog;
