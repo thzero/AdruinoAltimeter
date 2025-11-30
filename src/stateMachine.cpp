@@ -31,28 +31,79 @@ int stateMachine::altitudeOffsetLiftoff() {
 void stateMachine::initializeSensors() {
   // 20 degrees it the max deflection allowed by safety codes
   Serial.println(F("\t\tinitializeSensors...initialize begin"));
-  sensorValuesStruct sensorValues = _sensors->initialize(20.0);
+  sensorValuesStruct sensorValues;
+  _sensors->read(&sensorValues, 0, 0);
   Serial.println(F("\t\tinitializeSensors...initialize end"));
   
   Serial.println(F("\t\tinitializeSensors...getdata"));
   Serial.print(F("\t\tinitializeSensors..._flightLog: "));
   Serial.println(_flightLog == nullptr ? "null": "good");
+  
+  Serial.println(F("\t\tInitialize atmospheric sensors data..."));
+
   sensorData.atmosphere.humidity = _flightLog->humidityInitial = sensorValues.atmosphere.humidity;
   sensorData.atmosphere.pressure = _flightLog->pressureInitial = sensorValues.atmosphere.pressure;
   sensorData.atmosphere.temperature = _flightLog->temperatureInitial = sensorValues.atmosphere.temperature;
   sensorData.atmosphere.altitude = _flightLog->altitudeInitial = sensorValues.atmosphere.altitude;
 
+#ifdef DEBUG
+  Serial.print(F("\t\t\tinitial humidity: "));
+  Serial.println(_flightLog->humidityInitial);
+  Serial.print(F("\t\t\tinitial pressure: "));
+  Serial.println(_flightLog->pressureInitial);
+  Serial.print(F("\t\t\tinitial temperature: "));
+  Serial.println(_flightLog->temperatureInitial);
+  Serial.print(F("\t\t\tSensor altitude: "));
+  Serial.println(_flightLog->altitudeInitial);
+#endif
+
+  Serial.println(F("\t\t...atmospheric sensors data initialized!"));
+
+  Serial.println(F("\t\tInitialize IMU sensors data..."));
+
+  // accelerometerValues accelerometer = _sensors.readAccelerometer();
   sensorData.acceleration.x = sensorValues.acceleration.x;
   sensorData.acceleration.y = sensorValues.acceleration.y;
   sensorData.acceleration.z = sensorValues.acceleration.z;
 
+#ifdef DEBUG
+  Serial.print(F("\t\t\tinitial accelerometer.x: "));
+  Serial.println(sensorData.acceleration.x);
+  Serial.print(F("\t\t\tinitial accelerometer.y: "));
+  Serial.println(sensorData.acceleration.y);
+  Serial.print(F("\t\t\tinitial accelerometer.z: "));
+  Serial.println(sensorData.acceleration.z);
+#endif
+
+  // gyroscopeValues gyroscope = _sensors.readGyroscope();
   sensorData.gyroscope.x = sensorValues.gyroscope.x;
   sensorData.gyroscope.y = sensorValues.gyroscope.y;
   sensorData.gyroscope.z = sensorValues.gyroscope.z;
+
+#ifdef DEBUG
+  Serial.print(F("\t\t\tinitial gyroscope.x: "));
+  Serial.println(sensorData.gyroscope.x);
+  Serial.print(F("\t\t\tinitial gyroscope.y: "));
+  Serial.println(sensorData.gyroscope.y);
+  Serial.print(F("\t\t\tinitial gyroscope.z: "));
+  Serial.println(sensorData.gyroscope.z);
+#endif
   
+  // magnetometerValues magnetometer = _sensors.readMagnetometer();
   sensorData.magnetometer.x = sensorValues.magnetometer.x;
   sensorData.magnetometer.y = sensorValues.magnetometer.y;
   sensorData.magnetometer.z = sensorValues.magnetometer.z;
+
+#ifdef DEBUG
+  Serial.print(F("\t\t\tinitial magnetometer.x: "));
+  Serial.println(sensorData.magnetometer.x);
+  Serial.print(F("\t\t\tinitial magnetometer.y: "));
+  Serial.println(sensorData.magnetometer.y);
+  Serial.print(F("\t\t\tinitial magnetometer.z: "));
+  Serial.println(sensorData.magnetometer.z);
+#endif
+
+  Serial.println(F("\t\t...IMU sensors data initialized!"));
 }
 
 void stateMachine::loop(unsigned long timestamp, unsigned long delta) {
