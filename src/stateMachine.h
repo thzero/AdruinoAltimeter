@@ -51,7 +51,9 @@ class stateMachine {
     byte setup(flightLog* flightLog, sensors* sensors, StateMachineStateFunctionPtr stateFunc = nullptr, StateMachineStateThottledFunctionPtr stateThrottledFunc = nullptr, StateMachineStateChangedFunctionPtr stateChangedFunc = nullptr, StateMachinePreferenceLoadFunctionPtr stateLoadFunc = nullptr, StateMachinePreferenceSaveFunctionPtr stateSaveFunc = nullptr);
     flightStates state();
     const char * stateName();
-    
+    void updateTrace(unsigned long currentTimestamp, long diffTime);
+    void updateTrace(unsigned long currentTimestamp, long diffTime, atmosphereValues atmosphereValuesO, float altitudeDelta);
+
     sensorValuesStruct sensorData;
 
     int altitudeOffsetLiftoffValues[10] = { 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 };
@@ -74,8 +76,6 @@ class stateMachine {
     void loopStateGROUNDToAIRBORNE_ASCENT(unsigned long timestamp, unsigned long deltaElapsed);
     int _checkValues(int values[], int value, int defaultValue, int size);
     void _displaySettings();
-    void _updateTrace(unsigned long currentTimestamp, long diffTime);
-    void _updateTrace(unsigned long currentTimestamp, long diffTime, atmosphereValues atmosphereValuesO, float altitudeDelta);
 
     int _altitudeOffsetLiftoff = 0;
     int _altitudeOffsetGround = 0;

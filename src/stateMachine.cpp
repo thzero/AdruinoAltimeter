@@ -38,7 +38,7 @@ void stateMachine::initializeSensors() {
   Serial.println(F("\t\tinitializeSensors...getdata"));
   Serial.print(F("\t\tinitializeSensors..._flightLog: "));
   Serial.println(_flightLog == nullptr ? "null": "good");
-  
+
   Serial.println(F("\t\tInitialize atmospheric sensors data..."));
 
   sensorData.atmosphere.humidity = _flightLog->humidityInitial = sensorValues.atmosphere.humidity;
@@ -185,6 +185,8 @@ void stateMachine::loopStateABORTEDToGROUND(unsigned long timestamp, unsigned lo
   if (_loopStateChangedFunc != nullptr)
     _loopStateChangedFunc(FLIGHT_STATE_GROUND, _loopState, timestamp, deltaElapsed);
 
+  initializeSensors();
+
   _loopState = FLIGHT_STATE_GROUND;
 }
 
@@ -265,7 +267,7 @@ void stateMachine::loopStateAIRBORNE_ASCENT(unsigned long timestamp, unsigned lo
 // }
 #endif
 
-  _updateTrace(currentTimestamp, diffTime, atmosphereValuesO, altitudeDelta);
+  updateTrace(currentTimestamp, diffTime, atmosphereValuesO, altitudeDelta);
 
   // Detect apogee by taking X number of measures as long as the current is less
   // than the last recorded altitude.
@@ -464,7 +466,7 @@ void stateMachine::loopStateAIRBORNE_DESCENT(unsigned long timestamp, unsigned l
 // }
 #endif
 
-  _updateTrace(currentTimestamp, diffTime, atmosphereValuesO, altitudeDelta);
+  updateTrace(currentTimestamp, diffTime, atmosphereValuesO, altitudeDelta);
 
   bool timeoutRecordingCheck = ((timestamp - _flightLog->instance()->getData().timestampLaunch) > _stateMachineSettings.timeoutRecording);
 #ifdef DEBUG_ALTIMETER
@@ -583,6 +585,8 @@ void stateMachine::loopStateLANDEDToGROUND(unsigned long timestamp, unsigned lon
   if (_loopStateChangedFunc != nullptr)
     _loopStateChangedFunc(FLIGHT_STATE_GROUND, _loopState, timestamp, deltaElapsed);
 
+  initializeSensors();
+
   _loopState = FLIGHT_STATE_GROUND;
   _countdownLanded = 0;
 
@@ -672,7 +676,7 @@ void stateMachine::loopStateGROUNDToAIRBORNE_ASCENT(unsigned long timestamp, uns
 
   // Re-initialize the flight...
   _flightLog->init(timestamp);
-  _updateTrace(timestamp, 0);
+  updateTrace(timestamp, 0);
 
   if (_loopStateChangedFunc != nullptr)
     _loopStateChangedFunc(FLIGHT_STATE_AIRBORNE_ASCENT, _loopState, timestamp, deltaElapsed);
@@ -1104,6 +1108,12 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
   debug();
 #endif
 
+  Serial.println(F("\t...state machine sensor initialization..."));
+
+  initializeSensors();
+
+  Serial.println(F("\t...state machine initialization successful."));
+
   Serial.println(F("...state machine setup successful."));
   Serial.println();
   return 0;
@@ -1166,14 +1176,14 @@ void stateMachine::_displaySettings() {
   Serial.println(_stateMachineSettings.sampleRates.ground);
 }
 
-void stateMachine::_updateTrace(unsigned long currentTimestamp, long diffTime) {
+void stateMachine::updateTrace(unsigned long currentTimestamp, long diffTime) {
   atmosphereValues atmosphereValuesO = readSensorAtmosphere();
   float altitude = atmosphereValuesO.altitude;
   float altitudeDelta = altitude - _flightLog->instance()->getData().altitudeLast;
-  _updateTrace(currentTimestamp, diffTime, atmosphereValuesO, altitudeDelta);
+  updateTrace(currentTimestamp, diffTime, atmosphereValuesO, altitudeDelta);
 }
 
-void stateMachine::_updateTrace(unsigned long currentTimestamp, long diffTime, atmosphereValues atmosphereValuesO, float altitudeDelta) {
+void stateMachine::updateTrace(unsigned long currentTimestamp, long diffTime, atmosphereValues atmosphereValuesO, float altitudeDelta) {
   _flightLog->instance()->setAltitudeLast(_flightLog->instance()->getData().altitudeCurrent);
   _flightLog->instance()->setTimestampPrevious(_flightLog->instance()->getData().timestampCurrent);
 
