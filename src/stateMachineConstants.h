@@ -1,7 +1,7 @@
 #ifndef _STATE_MACHINE_CONSTANTS_H
 #define _STATE_MACHINE_CONSTANTS_H
 
-#define ALTITUDE_LIFTOFF 20
+#define ALTITUDE_LAUNCH_DETECT_OFFSET 20
 
 // Sample rate is in milliseconds
 // Based on Eggtimer Quantum documentation

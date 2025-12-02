@@ -18,7 +18,7 @@ struct __attribute__((packed)) settingsSampleRatesStruct {
 };
 
 struct __attribute__((packed)) settingStateMachineStruct {
-    int altitudeOffsetLiftoff = ALTITUDE_LIFTOFF;
+    int altitudeLaunchDetectOffset = ALTITUDE_LAUNCH_DETECT_OFFSET;
     settingsSampleMeasuresStruct sampleMeasures;
     settingsSampleRatesStruct sampleRates;
     // Assumed environmental values

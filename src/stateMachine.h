@@ -14,12 +14,10 @@
 #define DEV_SIM
 // #define DEBUG_ALTIMETER
 
-#define ALTITUDE_LIFTOFF 20
-
 #define PREFERENCE_KEY_ALTITUDE_AIRBORNE_ASCENT "smSRAA"
 #define PREFERENCE_KEY_ALTITUDE_AIRBORNE_DESCENT "smSRAD"
 #define PREFERENCE_KEY_ALTITUDE_GROUND "smSRG"
-#define PREFERENCE_KEY_ALTITUDE_LIFTOFF "smAL"
+#define PREFERENCE_KEY_ALTITUDE_LAUNCH_DETECT_OFFSET "smAL"
 #define PREFERENCE_KEY_LAUNCH_DETECT "smLD"
 
 typedef void (*StateMachineStateFunctionPtr)(flightStates state, unsigned long timestamp, unsigned long deltaElapsed);
@@ -32,7 +30,7 @@ class stateMachine {
   public:
     stateMachine();
     int altitudeOffsetGround();
-    int altitudeOffsetLiftoff();
+    int altitudeLaunchDetectOffset();
     int altitudeInitial();
     void initializeSensors();
     void loop(unsigned long timestamp, unsigned long delta);
@@ -47,7 +45,7 @@ class stateMachine {
     int sampleRateAirborneAscent();
     int sampleRateAirborneDescent();
     int sampleRateGround();
-    void save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent, int sampleRateAirborneDecent, int sampleRateGround);
+    void save(int altitudeLaunchDetectOffset, int sampleRateAirborneAscent, int sampleRateAirborneDecent, int sampleRateGround);
     byte setup(flightLog* flightLog, sensors* sensors, StateMachineStateFunctionPtr stateFunc = nullptr, StateMachineStateThottledFunctionPtr stateThrottledFunc = nullptr, StateMachineStateChangedFunctionPtr stateChangedFunc = nullptr, StateMachinePreferenceLoadFunctionPtr stateLoadFunc = nullptr, StateMachinePreferenceSaveFunctionPtr stateSaveFunc = nullptr);
     flightStates state();
     const char * stateName();
@@ -56,7 +54,7 @@ class stateMachine {
 
     sensorValuesStruct sensorData;
 
-    int altitudeOffsetLiftoffValues[10] = { 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 };
+    int altitudeLaunchDetectOffsetValues[10] = { 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 };
     int sampleRateAirborneAscentValues[4] = { 15, 20, 25, 30 };
     int sampleRateAirborneDecentValues[8] = { 1, 2, 3, 4, 5, 6, 8, 10 };
     int sampleRateGroundValues[8] = { 5, 10, 15, 20, 25, 30, 35, 40 };
@@ -77,7 +75,7 @@ class stateMachine {
     int _checkValues(int values[], int value, int defaultValue, int size);
     void _displaySettings();
 
-    int _altitudeOffsetLiftoff = 0;
+    int _altitudeLaunchDetectOffset = 0;
     int _altitudeOffsetGround = 0;
     unsigned int _countdownAborted = 0;
     unsigned int _countdownLanded = 0;

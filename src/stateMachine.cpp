@@ -8,7 +8,7 @@
 #include "stateMachine.h"
 
 stateMachine::stateMachine() {
-  _stateMachineSettings.altitudeOffsetLiftoff = ALTITUDE_LIFTOFF;
+  _stateMachineSettings.altitudeLaunchDetectOffset = ALTITUDE_LAUNCH_DETECT_OFFSET;
   _stateMachineSettings.sampleRates.airborneAscent = SAMPLE_RATE_AIRBORNE_ASCENT;
   _stateMachineSettings.sampleRates.airborneDescent = SAMPLE_RATE_AIRBORNE_DESCENT;
   _stateMachineSettings.sampleRates.ground = SAMPLE_RATE_GROUND;
@@ -24,8 +24,8 @@ int stateMachine::altitudeOffsetGround() {
   return _altitudeOffsetGround;
 }
 
-int stateMachine::altitudeOffsetLiftoff() {
-  return _altitudeOffsetLiftoff;
+int stateMachine::altitudeLaunchDetectOffset() {
+  return _altitudeLaunchDetectOffset;
 }
 
 void stateMachine::initializeSensors() {
@@ -620,7 +620,7 @@ void stateMachine::loopStateGROUND(unsigned long timestamp, unsigned long deltaE
 
   // Get the current altitude and determine the delta from initial.
   float altitude = readSensorAltitude();
-  float altitudeLaunchApogeeTarget = _flightLog->altitudeInitial + _altitudeOffsetLiftoff;
+  float altitudeLaunchApogeeTarget = _flightLog->altitudeInitial + _altitudeLaunchDetectOffset;
 #ifdef DEBUG_ALTIMETER
 //   debug(F("stateGROUND...processing, delta"), delta);
 //   debug(F("stateGROUND...processing, deltaElapsed"), deltaElapsed);
@@ -630,9 +630,9 @@ void stateMachine::loopStateGROUND(unsigned long timestamp, unsigned long deltaE
 #endif
   debug(F("loopStateGROUND...altitude"), altitude);
   debug(F("loopStateGROUND...altitudeInitial"), _flightLog->altitudeInitial);
-  debug(F("loopStateGROUND...altitudeOffsetLiftoffCutoff"), _altitudeOffsetLiftoff);
+  debug(F("loopStateGROUND...altitudeLaunchDetectOffsetCutoff"), _altitudeLaunchDetectOffset);
   debug(F("loopStateGROUND...altitudeLaunchApogeeTarget"), altitudeLaunchApogeeTarget);
-  debug(F("loopStateGROUND...altitudeOffsetLiftoff?"), (altitude > altitudeLaunchApogeeTarget));
+  debug(F("loopStateGROUND...altitudeLaunchDetectOffset?"), (altitude > altitudeLaunchApogeeTarget));
 // }
 #endif
 
@@ -647,9 +647,9 @@ void stateMachine::loopStateGROUND(unsigned long timestamp, unsigned long deltaE
     debug(F("loopStateGROUND...processing, launch detected"), 0);
     debug(F("loopStateGROUND...altitude"), altitude);
     debug(F("loopStateGROUND...altitudeInitial"), _flightLog->altitudeInitial);
-    debug(F("loopStateGROUND...altitudeOffsetLiftoffCutoff"), _altitudeOffsetLiftoff);
+    debug(F("loopStateGROUND...altitudeLaunchDetectOffsetCutoff"), _altitudeLaunchDetectOffset);
     debug(F("loopStateGROUND...altitudeLaunchApogeeTarget"), altitudeLaunchApogeeTarget);
-    debug(F("loopStateGROUND...altitudeOffsetLiftoff?"), (altitude > altitudeLaunchApogeeTarget));
+    debug(F("loopStateGROUND...launchDetect?"), (altitude > altitudeLaunchApogeeTarget));
     debug();
     debug();
     debug();
@@ -688,7 +688,7 @@ void stateMachine::preferencesOutput() {
 #if defined(ESP32)
   // Preferences preferences;
   // preferences.begin(PREFERENCE_KEY, false);
-  // int altitudeOffsetLiftoff = preferences.getInt(PREFERENCE_KEY_LAUNCH_DETECT, _stateMachineSettings.altitudeOffsetLiftoff);
+  // int altitudeLaunchDetectOffset = preferences.getInt(PREFERENCE_KEY_LAUNCH_DETECT, _stateMachineSettings.altitudeLaunchDetectOffset);
   // int sampleRateAirborneAscent = preferences.getInt(PREFERENCE_KEY_ALTITUDE_AIRBORNE_ASCENT, _stateMachineSettings.sampleRates.aAirborneAscent);
   // int sampleRateAirborneDescent = preferences.getInt(PREFERENCE_KEY_ALTITUDE_AIRBORNE_DESCENT, _stateMachineSettings.sampleRates.airborneDescent);
   // int sampleRateGround = preferences.getInt(PREFERENCE_KEY_ALTITUDE_GROUND, _stateMachineSettings.sampleRates.ground);
@@ -697,8 +697,8 @@ void stateMachine::preferencesOutput() {
   // char intFormat[3] = "%i";
   // char preferencesOutput[80] = "";
   // char temp[9] = "";
-  // strcat(preferencesOutput, "$stateMachineSettings.altitudeOffsetLiftoff,");
-  // sprintf(temp, intFormat, altitudeOffsetLiftoff);
+  // strcat(preferencesOutput, "$stateMachineSettings.altitudeLaunchDetectOffset,");
+  // sprintf(temp, intFormat, altitudeLaunchDetectOffset);
   // strcat(preferencesOutput, temp);
   // strcat(preferencesOutput, ";\n");
 
@@ -848,12 +848,12 @@ magnetometerValues stateMachine::readSensorMagnetometer() {
 void stateMachine::reset() {
   Serial.println(F("Reset state machine..."));
 
-  _altitudeOffsetLiftoff = _stateMachineSettings.altitudeOffsetLiftoff;
+  _altitudeLaunchDetectOffset = _stateMachineSettings.altitudeLaunchDetectOffset;
   _sampleRateAirborneAscent = _stateMachineSettings.sampleRates.airborneAscent;
   _sampleRateAirborneDescent = _stateMachineSettings.sampleRates.airborneDescent;
   _sampleRateGround = _stateMachineSettings.sampleRates.ground;
   
-  save(_altitudeOffsetLiftoff, _sampleRateAirborneAscent, _sampleRateAirborneDescent, _sampleRateGround);
+  save(_altitudeLaunchDetectOffset, _sampleRateAirborneAscent, _sampleRateAirborneDescent, _sampleRateGround);
 
   Serial.println(F("...state machine reset successful."));
 }
@@ -875,13 +875,13 @@ int stateMachine::sampleRateGround() {
   return _sampleRateGround;
 }
 
-void stateMachine::save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent, int sampleRateAirborneDecent, int sampleRateGround) {
+void stateMachine::save(int altitudeLaunchDetectOffset, int sampleRateAirborneAscent, int sampleRateAirborneDecent, int sampleRateGround) {
   Serial.println(F("\tSave state machine..."));
   
 #ifdef DEBUG
   Serial.println(F("\t\t...state machine... save requests"));
-  Serial.print(F("\t\taltitudeOffsetLiftoff="));
-  Serial.println(altitudeOffsetLiftoff);
+  Serial.print(F("\t\taltitudeLaunchDetectOffset="));
+  Serial.println(altitudeLaunchDetectOffset);
   Serial.print(F("\t\tsampleRateAirborneAscent="));
   Serial.println(sampleRateAirborneAscent);
   Serial.print(F("\t\tsampleRateAirborneDecent="));
@@ -905,7 +905,7 @@ void stateMachine::save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent,
   debug();
 #endif
 
-  _altitudeOffsetLiftoff = _checkValues(altitudeOffsetLiftoffValues, altitudeOffsetLiftoff, _stateMachineSettings.altitudeOffsetLiftoff, sizeof(altitudeOffsetLiftoffValues) / sizeof(altitudeOffsetLiftoffValues[0]));
+  _altitudeLaunchDetectOffset = _checkValues(altitudeLaunchDetectOffsetValues, altitudeLaunchDetectOffset, _stateMachineSettings.altitudeLaunchDetectOffset, sizeof(altitudeLaunchDetectOffsetValues) / sizeof(altitudeLaunchDetectOffsetValues[0]));
   _sampleRateAirborneAscent = _checkValues(sampleRateAirborneAscentValues, sampleRateAirborneAscent, _stateMachineSettings.sampleRates.airborneAscent, sizeof(sampleRateAirborneAscentValues) / sizeof(sampleRateAirborneAscentValues[0]));
   _sampleRateAirborneDescent = _checkValues(sampleRateAirborneDecentValues, sampleRateAirborneDecent, _stateMachineSettings.sampleRates.airborneDescent, sizeof(sampleRateAirborneDecentValues) / sizeof(sampleRateAirborneDecentValues[0]));
   _sampleRateGround = _checkValues(sampleRateGroundValues, sampleRateGround, _stateMachineSettings.sampleRates.ground, sizeof(sampleRateGroundValues) / sizeof(sampleRateGroundValues[0]));
@@ -924,8 +924,8 @@ void stateMachine::save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent,
   
 #ifdef DEBUG
   Serial.println(F("\t\t...state machine... save checked"));
-  Serial.print(F("\t\t_altitudeOffsetLiftoff="));
-  Serial.println(_altitudeOffsetLiftoff);
+  Serial.print(F("\t\t_altitudeLaunchDetectOffset="));
+  Serial.println(_altitudeLaunchDetectOffset);
   Serial.print(F("\t\t_sampleRateAirborneAscent="));
   Serial.println(_sampleRateAirborneAscent);
   Serial.print(F("\t\t_sampleRateAirborneDescent="));
@@ -951,7 +951,7 @@ void stateMachine::save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent,
 #if defined(ESP32)
   // Preferences preferences;
   // preferences.begin(PREFERENCE_KEY, false);
-  // preferences.putInt(PREFERENCE_KEY_LAUNCH_DETECT, _altitudeOffsetLiftoff);
+  // preferences.putInt(PREFERENCE_KEY_LAUNCH_DETECT, _altitudeLaunchDetectOffset);
   // preferences.putInt(PREFERENCE_KEY_ALTITUDE_AIRBORNE_ASCENT, _sampleRateAirborneAscent);
   // preferences.putInt(PREFERENCE_KEY_ALTITUDE_AIRBORNE_DESCENT, _sampleRateAirborneDescent);
   // preferences.putInt(PREFERENCE_KEY_ALTITUDE_GROUND, _sampleRateGround);
@@ -970,7 +970,7 @@ void stateMachine::save(int altitudeOffsetLiftoff, int sampleRateAirborneAscent,
   debug();
 #endif
 
-  _altitudeOffsetGround = _altitudeOffsetLiftoff / 2;
+  _altitudeOffsetGround = _altitudeLaunchDetectOffset / 2;
 
 #ifdef DEBUG
   Serial.println(F("\t\t...state machine... saved state"));
@@ -1012,10 +1012,10 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
 #if defined(ESP32)
   // Preferences preferences;
   // preferences.begin(PREFERENCE_KEY, false);
-  // _altitudeOffsetLiftoff = preferences.getInt(PREFERENCE_KEY_LAUNCH_DETECT, stateMachineSettings.altitudeOffsetLiftoff);
-  // if (_altitudeOffsetLiftoff <= 0) {
-  //   _altitudeOffsetLiftoff = stateMachineSettings.altitudeOffsetLiftoff;
-  //   preferences.putInt(PREFERENCE_KEY_LAUNCH_DETECT, _altitudeOffsetLiftoff);
+  // _altitudeLaunchDetectOffset = preferences.getInt(PREFERENCE_KEY_LAUNCH_DETECT, stateMachineSettings.altitudeLaunchDetectOffset);
+  // if (_altitudeLaunchDetectOffset <= 0) {
+  //   _altitudeLaunchDetectOffset = stateMachineSettings.altitudeLaunchDetectOffset;
+  //   preferences.putInt(PREFERENCE_KEY_LAUNCH_DETECT, _altitudeLaunchDetectOffset);
   // }
   // _sampleRateAirborneAscent = preferences.getInt(PREFERENCE_KEY_ALTITUDE_AIRBORNE_ASCENT, stateMachineSettings.sampleRateAirborneAscent);
   // if (_sampleRateAirborneAscent <= 0) {
@@ -1035,8 +1035,8 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
   // preferences.end();
 #endif
 
-  if (_stateMachineSettings.altitudeOffsetLiftoff <= 0)
-    _stateMachineSettings.altitudeOffsetLiftoff = ALTITUDE_LIFTOFF;
+  if (_stateMachineSettings.altitudeLaunchDetectOffset <= 0)
+    _stateMachineSettings.altitudeLaunchDetectOffset = ALTITUDE_LAUNCH_DETECT_OFFSET;
   if (_stateMachineSettings.sampleRates.airborneAscent <= 0)
     _stateMachineSettings.sampleRates.airborneAscent = SAMPLE_RATE_AIRBORNE_ASCENT;
   if (_stateMachineSettings.sampleRates.airborneDescent <= 0)
@@ -1044,7 +1044,7 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
   if (_stateMachineSettings.sampleRates.ground <= 0)
     _stateMachineSettings.sampleRates.ground = SAMPLE_RATE_GROUND;
 
-  // _stateMachineSettings.altitudeOffsetLiftoff = ALTITUDE_LIFTOFF;
+  // _stateMachineSettings.altitudeLaunchDetectOffset = ALTITUDE_LAUNCH_DETECT_OFFSET;
   // _stateMachineSettings.sampleRates.aborted = SAMPLE_MEASURES_ABORTED;
   // _stateMachineSettings.sampleRates.landed = SAMPLE_RATE_LANDED;
   _stateMachineSettings.sampleMeasures.aborted = SAMPLE_MEASURES_ABORTED;
@@ -1061,7 +1061,7 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
   debug();
 #endif
 
-  _altitudeOffsetLiftoff = _stateMachineSettings.altitudeOffsetLiftoff;
+  _altitudeLaunchDetectOffset = _stateMachineSettings.altitudeLaunchDetectOffset;
   _sampleRateAirborneAscent = _stateMachineSettings.sampleRates.airborneAscent;
   _sampleRateAirborneDescent = _stateMachineSettings.sampleRates.airborneDescent;
   _sampleRateGround = _stateMachineSettings.sampleRates.ground;
@@ -1078,7 +1078,7 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
   debug();
 #endif
 
-  _altitudeOffsetGround = _altitudeOffsetLiftoff / 2;
+  _altitudeOffsetGround = _altitudeLaunchDetectOffset / 2;
 
   Serial.println(F("\t...state machine settings..."));
   _displaySettings();
@@ -1095,7 +1095,7 @@ byte stateMachine::setup(flightLog* flightLog, sensors* sensors, StateMachineSta
   debug();
 #endif
 
-  save(_altitudeOffsetLiftoff, _sampleRateAirborneAscent, _sampleRateAirborneDescent, _sampleRateGround);
+  save(_altitudeLaunchDetectOffset, _sampleRateAirborneAscent, _sampleRateAirborneDescent, _sampleRateGround);
 
 #ifdef DEBUG
   debug();
@@ -1152,10 +1152,10 @@ int stateMachine::_checkValues(int values[], int value, int defaultValue, int si
 }
 
 void stateMachine::_displaySettings() {
-  Serial.print(F("\taltitudeOffsetLiftoff="));
-  Serial.print(_altitudeOffsetLiftoff);
+  Serial.print(F("\taltitudeLaunchDetectOffset="));
+  Serial.print(_altitudeLaunchDetectOffset);
   Serial.print(F(", default="));
-  Serial.println(_stateMachineSettings.altitudeOffsetLiftoff);
+  Serial.println(_stateMachineSettings.altitudeLaunchDetectOffset);
   Serial.print(F("\taltitudeOffsetGround="));
   Serial.println(_altitudeOffsetGround);
   Serial.print(F("\tsampleRateAirborneAscent="));

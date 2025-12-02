@@ -4,8 +4,8 @@
 stateMachineSync::stateMachineSync() {
 }
 
-int stateMachineSync::altitudeOffsetLiftoff() {
-  return _altitudeOffsetLiftoff;
+int stateMachineSync::altitudeLaunchDetectOffset() {
+  return _altitudeLaunchDetectOffset;
 }
 
 void stateMachineSync::loop(unsigned long timestamp, unsigned long deltaElapsed) {
@@ -23,8 +23,8 @@ int stateMachineSync::sampleRateGround() {
   return _sampleRateGround;
 }
 
-void stateMachineSync::setAltitudeOffsetLiftoff(int altitudeOffsetLiftoff) {
-  _altitudeOffsetLiftoff = altitudeOffsetLiftoff;
+void stateMachineSync::setAltitudeLaunchDetectOffset(int altitudeLaunchDetectOffset) {
+  _altitudeLaunchDetectOffset = altitudeLaunchDetectOffset;
 }
 void stateMachineSync::setSampleRateAirborneAscent(int altitudeAirborneDescent) {
   _sampleRateAirborneAscent = altitudeAirborneDescent;
