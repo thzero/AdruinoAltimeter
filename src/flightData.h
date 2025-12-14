@@ -111,6 +111,7 @@ struct __attribute__((packed)) flightDataImuValues {
   float pitch;
   float yaw;
   bool vertical;
+  bool verticalByTolerance;
 };
 
 struct __attribute__((packed)) flightDataMagnetometerValues {

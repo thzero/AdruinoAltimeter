@@ -15,8 +15,9 @@ sensorValuesStruct sensorsBase::initialize(float verticalTolerance) {
   sensorValuesStruct data2 = _imuSensor->initialize();
 
   Serial.println(F("\t\t...IMU sensors initialized!"));
+  
+  _verticalTolerance = verticalTolerance;
 
-  _imuSensor->setVerticalTolerance(verticalTolerance);
   data.acceleration = data2.acceleration;
   data.gyroscope = data2.gyroscope;
   return data;
@@ -26,6 +27,19 @@ int8_t sensorsBase::initOverride(SensorOverrideFunctionPtr atmosphereFuncOverrid
   _atmosphereSensor->initOverride(atmosphereFuncOverride);
   _imuSensor->initOverride(imuFuncOverride);
   return 0;
+}
+
+void sensorsBase::integrateImu(sensorValuesStruct* data, unsigned long current, unsigned long delta) {
+  // Check if the sensor is aligned with Z-up (pitch or roll must be close to 0 or 180 degrees) within the allowed vertical tolerance
+  bool isPitchLessThanTolerance = (fabs(data->imu.pitch) <= _verticalTolerance) || (fabs(fabs(data->imu.pitch) - 180.0f) <= _verticalTolerance);
+  Serial.print(F("sensorsBase::integrateImu::isPitchLessThanTolerance="));
+  Serial.println(isPitchLessThanTolerance);
+  bool isRollLessThanTolerance = (fabs(data->imu.roll) <= _verticalTolerance) || (fabs(fabs(data->imu.roll) - 180.0f) <= _verticalTolerance);
+  Serial.print(F("sensorsBase::integrateImu::isRollLessThanTolerance="));
+  Serial.println(isRollLessThanTolerance);
+  data->imu.verticalByTolerance = isPitchLessThanTolerance && isRollLessThanTolerance;
+  Serial.print(F("sensorsBase::integrateImu::verticalByTolerance="));
+  Serial.println(data->imu.verticalByTolerance);
 }
 
 void sensorsBase::integrateVelocity(sensorValuesStruct* data, unsigned long current, unsigned long delta) {
@@ -72,6 +86,41 @@ void sensorsBase::read(sensorValuesStruct* data, unsigned long current, unsigned
   readAtmosphere(data, current, delta);
   readImu(data, current, delta);
 
+  // Serial.print(data->acceleration.x);
+  // Serial.print("\t");
+  // Serial.print(data->acceleration.y);
+  // Serial.print("\t");
+  // Serial.print(data->acceleration.z);
+  // Serial.print("\t");
+  // Serial.print(data->gyroscope.x);
+  // Serial.print("\t");
+  // Serial.print(data->gyroscope.y);
+  // Serial.print("\t");
+  // Serial.print(data->gyroscope.z);
+  // Serial.print("\t");
+  // Serial.print(data->magnetometer.x);
+  // Serial.print("\t");
+  // Serial.print(data->magnetometer.y);
+  // Serial.print("\t");
+  // Serial.print(data->magnetometer.z);
+  // Serial.print("\t");
+  // Serial.print(data->imu.pitch);
+  // Serial.print("\t");
+  // Serial.print(data->imu.pitch1);
+  // Serial.print("\t");
+  // Serial.print(data->imu.roll);
+  // Serial.print("\t");
+  // Serial.print(data->imu.roll1);
+  // Serial.print("\t");
+  // Serial.print(data->imu.yaw);
+  // Serial.print("\t");
+  // Serial.print("---");
+  // Serial.print("\t");
+  // Serial.print(data->imu.vertical);
+  // Serial.println();
+  // Serial.println();
+
+  // integrateImu(data, current, delta);
   integrateVelocity(data, current, delta);
 }
 
@@ -79,7 +128,7 @@ float sensorsBase::readAltitude() {
   return _atmosphereSensor->readAltitude();
 }
 
-float sensorsBase::readAltitude(atmosphereValues values) {
+float sensorsBase::readAltitude(atmosphereValues* values) {
   return _atmosphereSensor->readAltitude(values);
 }
 
@@ -93,6 +142,37 @@ void sensorsBase::sleep() {
   _imuSensor->sleep();
 
   Serial.println(F("...sensors sleep successful."));
+}
+
+sensorsSetupResults sensorsBase::setup(sensorBarometer* atmosphereSensor, sensorIMU* imuSensor, sensorGPS* gps, uint8_t calibrationBarometerId, uint8_t calibrationBarometerStatusId, uint8_t calibrationIMUId, uint8_t calibrationIMUStatusId) {
+  sensorsSetupResults results;
+  
+  _atmosphereSensor = atmosphereSensor;
+  if (_atmosphereSensor == nullptr) {
+    Serial.println(F("\t...sensors invalid atmospheric sensor."));
+    results.atmosphere = 1;
+  }
+  Serial.println(F("\t...sensors valid atmospheric sensor."));
+
+  _gps = gps;
+  if (_gps == nullptr) {
+    Serial.println(F("\t...sensors invalid GPS sensor."));
+    results.gps = 1;
+  }
+  Serial.println(F("\t...sensors valid GPS sensor."));
+
+  _imuSensor = imuSensor;
+  if (_imuSensor == nullptr) {
+    Serial.println(F("\t...sensors invalid IMU sensor."));
+    results.imu = 1;
+  }
+  Serial.println(F("\t...sensors valid IMU sensor."));
+
+  // Serial.printf("atmosphere: %d, gps: %d, imu: %d = ", results.atmosphere, results.gps, results.imu);
+  results.sensors = results.atmosphere || results.gps || results.imu;
+  // Serial.printf("results.sensors: %d\n", results.sensors);
+
+  return setupI(results, calibrationBarometerId, calibrationBarometerStatusId, calibrationIMUId, calibrationIMUStatusId);
 }
 
 void sensorsBase::setupCompleted() {
